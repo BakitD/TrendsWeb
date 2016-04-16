@@ -9,20 +9,22 @@ from django.contrib.auth import authenticate, login, logout, update_session_auth
 
 from .forms import RegisterForm, ProfileEditForm, PasswordResetForm
 from django.forms.forms import NON_FIELD_ERRORS
+from models import TrendModel
+
 
 import json
 from django_redis import get_redis_connection
 redis = get_redis_connection('default')
 
-from models import TrendModel
 
 def init_trends():
 	data = json.loads(redis.get('geomap'))
-	for woeid, d in data.iteritems():
+	'''for woeid, d in data.iteritems():
 		if d['trends']:
 			print woeid, ', lnlt:, ',(d['coordinates']), ' trends: ', d['trends']
+	'''
 
-#TODO make this
+#TODO to another file
 #init_trends()
 
 

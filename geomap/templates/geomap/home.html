@@ -7,45 +7,35 @@
 	{% leaflet_js %}
 	{% leaflet_css %}
 
+	<meta charset=utf-8 />
+	<title>GeoMap</title>
+	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+	<script src='https://api.mapbox.com/mapbox.js/v2.4.0/mapbox.js'></script>
+	<link href='https://api.mapbox.com/mapbox.js/v2.4.0/mapbox.css' rel='stylesheet' />
 	<style>
-		.leaflet-container {
-			max-width: 90%;
-			max-height: 90%;
-			width: 1100px;
-			height: 570px;
-			margin-top: 5px;
-		}
-
-
-		body{
-			padding-top: 50px;
-			background-image: none;
-			background-color: #B0C4DE;
-		}
+		body { margin:0; padding:0;}
+		#map { position:absolute; top:0; bottom:0; width:100%; }
 	</style>
+
 {% endblock %}
 
 
 {% block content %}
+	<div id='map'></div>
+	<script>
+		L.mapbox.accessToken = 'pk.eyJ1IjoiYmFraXQiLCJhIjoiY2ltZHMzbWN'+
+			'iMDAyOHdka2toYzdkNTc4ciJ9.5nYeNUZPv2ohnoYWknNIpw';
 
-	<script type="text/javascript">
-		var collection = {{ trends|geojsonfeature:"popupContent"|safe }};
-		function onEachFeature(feature, layer) {
-		    if (feature.properties && feature.properties.popupContent) {
-		      layer.bindPopup(feature.properties.popupContent);
-		    }
-		}
-		function map_init(map, options) {
-    			L.geoJson(collection, {onEachFeature: onEachFeature}).addTo(map);
-  		}
-    	</script>
+		var mapboxTiles = L.tileLayer('https://api.mapbox.com/v4/bakit.dc14b0c3/'+
+			'{z}/{x}/{y}.png?access_token=' + L.mapbox.accessToken, {
+    			attribution: '© <a href="https://www.mapbox.com/map-feedback/'+
+			'">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'});
 
-	
-	  <div >
-		<div class="container map">
-			{% leaflet_map "geomap" callback="window.map_init"%}
-		</div>
-	  </div>
+		var map = L.map('map', { zoomControl: false })
+    			.addLayer(mapboxTiles)
+    			.setView([30.0, 70], 4);
+		new L.Control.Zoom({ position: 'bottomright' }).addTo(map);
+	</script>
 
 {% endblock %}
 
