@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	{% load staticfiles %}
+
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+
+	{% load bootstrap3 %}
+	{% bootstrap_css %}
+	{% bootstrap_javascript %}	
+
+
+	<style>
+		body{
+			padding-top: 50px;
+			background-image: url('{{STATIC_URL}}geomap/world_map.gif');
+			background-size: cover;
+		}
+		.nvbspace {padding: 10px; border-radius: 15px;}
+	</style>
+
+	{% block headblock%}
+	{% endblock %}
+
+
+</head>
+
+<body>
+    <header class = "navbar navbar-inverse navbar-fixed-top">
+	<div class = "container">
+
+
+	    <div class="navbar-brand pull-right">
+	     {% if not user.is_authenticated %}
+		<form action="{% url 'loginview'%}" method="post">
+		   {% csrf_token %}
+		   {% if login_errors %}
+		      <div class="dropdown open pull-right">
+		   {% else %}
+		      <div class="dropdown pull-right">
+		   {% endif %}
+			  <button class="btn btn-primary btn-sm dropdown-toggle" 
+					type="button" data-toggle="dropdown">Log In
+			  		<span class="caret"></span></button>
+				  <ul class="dropdown-menu nvbspace">
+
+				    {% if login_errors %}
+				      <li>
+					<div class="alert alert-danger fade in">
+					 <ul>
+					  {% for error in login_errors %}
+					    <li>{{ error }}</li>
+					  {% endfor %}
+					 </ul>
+					</div>
+				      </li>
+				    {% endif %}
+
+				    <li class="dropdown-header"><font color="black"><b>login</b></font></li>
+				    <li>
+					<font color="black">
+						<input type="text" name="username" value="" />
+					</font>
+				    </li>
+				    <li class="dropdown-header"><font color="black"><b>password</b></font></li>
+				    <li>
+					<font color="black">
+						<input type="password" name="password" value="" />
+					</font>					
+				    </li>
+				    <p>
+				    <li align="center">
+					<b><input class="btn-success" type="submit" value="submit"/></b>
+				    </li>
+				    <li class="divider"></li>
+				    <li align="center">
+					<a href="{% url 'register' %}" class="btn-primary btn-sm"><b>Sign Up</b></a>
+				    </li>
+				    <li class="divider"></li>
+				    <li align="center">
+					<a href="{% url 'reset' %}" class="btn-warning btn-sm">
+					<b>Password reset</b></a>
+				    </li>
+				  </ul>
+		      </div>
+		</form>
+	     {% else %}
+		<h4>Hello, {{ user.first_name }}</h4>
+		<a href="{% url 'logoutview' %}" class="btn-primary btn-sm"><b>Logout</b></a>
+	     {% endif %}
+	    </div><!-- End navbar input-->
+
+
+	    <div class ="navbar-header">
+		<button type = "button" class= "navbar-toggle" data-toggle = "collapse" data-target = "#dropdown">
+		    <span class = "sr-only">Toggle navigation</span>
+		    <span class="icon-bar"></span>
+		    <span class="icon-bar"></span>
+		    <span class="icon-bar"></span>
+		</button>
+
+		<a href="{% url 'index' %}" class ="navbar-brand">
+			<font color=white><b>GeoMap</b></font>
+		</a>
+	    </div><!-- End Navbar Header-->
+
+	    <div class="collapse navbar-collapse" id = "dropdown">
+		<ul class = "nav navbar-nav navbar-left" role = "navigation">
+		 <li><a href="#"><font color=#e5e5ff><b>About</b></font></a></li>
+		</ul>
+
+		{% if user.is_authenticated %}
+			<ul class = "nav navbar-nav navbar-left" role = "navigation">
+			 <li><a href="{% url 'profile' %}"><font color=darkorange><b>Profile</b></font></a></li>
+			</ul>
+		{% endif %}
+	    </div><!-- End Nav Contents -->
+
+
+	</div><!-- End Container -->
+    </header>
+	{% block content %} <!--> IT'S BETTER NOT TO USE THIS BLOCK )) <!-->
+	{% endblock %}
+	{% block footer %}
+	{% endblock %}
+</body>
+</hmtl>

@@ -1,0 +1,57 @@
+{% extends "geomap/base.html" %}
+{% load staticfiles %}
+
+{% block headblock %}
+<style>
+	table {
+		border-spacing: 10px; 
+		border-collapse: separate;
+		text-align: right;
+	}
+
+	.valign {
+		float: none;
+		display: inline-block;
+		vertical-align: middle;
+	}
+</style>
+{% endblock %}
+
+
+{% block content %}
+	<div class="jumbotron">
+	 <div class="container">
+	  <div class="row">
+	   <div class="col-xs-2 col-md-8 col-md-offset-4">
+		<div class="container">
+		 {% if reg_form.errors %}
+		  <div class="alert alert-danger">
+		    <strong>Incorrect input</strong><br>
+		    <ul>
+		    {% for field, errors in reg_form.errors.items %}
+		    	{{ errors }}
+		    {% endfor %}
+		   </ul>
+		  </div>
+		 {% endif %}
+		 <form action="{% url 'register' %}" method="post">
+		  {% csrf_token %}
+		  <table>
+			<tr><td><h2>Register</h2></td></tr>
+		  	<tr><td>{{reg_form.name.label}}:</td><td>{{ reg_form.name }}</td></tr>
+			<tr><td>{{reg_form.email.label}}:</td><td>{{ reg_form.email }}</td></tr>
+			<tr><td>{{reg_form.username.label}}:</td><td>{{ reg_form.username }}</td></tr>
+			<tr><td>{{reg_form.password1.label}}:</td><td>{{ reg_form.password1 }}</td></tr>
+			<tr><td>{{reg_form.password2.label}}:</td><td>{{ reg_form.password2 }}</td></tr>
+			<tr><td></td><td>
+				<b><input type="submit" class="btn-success" value="Submit"/></b>
+			</td></tr>
+		  </table>
+		 </form>
+		</div>
+	   </div>
+	  </div>
+	 </div>
+	</div>
+{% endblock %}
+
