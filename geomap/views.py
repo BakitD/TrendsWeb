@@ -17,6 +17,7 @@ from django_redis import get_redis_connection
 redis = get_redis_connection('default')
 
 
+
 def init_trends():
 	data = json.loads(redis.get('geomap'))
 	'''for woeid, d in data.iteritems():
@@ -34,8 +35,8 @@ def anonymous_required(user):
 
 # VIEWS
 def index(request):
-	trends = TrendModel.objects.all()
-	return render(request, 'geomap/home.html', {'trends' : trends})
+	#trends = json.loads(redis.get('geomap'))
+	return render(request, 'geomap/home.html', {'trends' : redis.get('geomap')})
 
 @login_required
 def logoutview(request):
