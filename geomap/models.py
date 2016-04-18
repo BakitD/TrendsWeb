@@ -18,32 +18,52 @@ class TrendModel(models.Model):
 		return '{}'.format(self.name.encode('utf8'))
 
 class Place(models.Model):
-    name = models.CharField(unique=True, max_length=32)
-    woeid = models.CharField(unique=True, max_length=16)
-    longitude = models.CharField(max_length=32)
-    latitude = models.CharField(max_length=32)
-    parent_id = models.CharField(max_length=16, blank=True, null=True)
-    dtime = models.DateTimeField()
-    placetype = models.ForeignKey('Placetype', models.DO_NOTHING)
+	name = models.CharField(unique=True, max_length=32)
+	woeid = models.CharField(unique=True, max_length=16)
+	longitude = models.CharField(max_length=32)
+	latitude = models.CharField(max_length=32)
+	parent_id = models.CharField(max_length=16, blank=True, null=True)
+	dtime = models.DateTimeField()
+	placetype = models.ForeignKey('Placetype', models.DO_NOTHING)
 
-    class Meta:
-        managed = False
-        db_table = 'place'
+	class Meta:
+		managed = False
+		db_table = 'place'
+
+	@staticmethod
+	def get_countries():
+		cid = Placetype.objects.filter(name='country').first().id
+		countries = Place.objects.filter(placetype_id=cid).order_by('name')
+		return [{'name' : country.name, 'woeid' : country.woeid} for country in countries]
+
+
+	@staticmethod
+	def get_citytrends(woeid):
+		citytrends = []
+		trends = {}
+		cities = Place.objects.filter(parent_id=woeid).order_by('name')
+		for city in cities:
+			trends_obj = Trend.objects.filter(place_id=city.id)
+			for t in trends_obj: trends[t.name] = t.volume
+			citytrends.append({'city' : city.name, 'trends' : trends})
+		return citytrends
+
+
 
 
 class Placetype(models.Model):
-    name = models.CharField(unique=True, max_length=16)
+	name = models.CharField(unique=True, max_length=16)
 
-    class Meta:
-        managed = False
-        db_table = 'placetype'
+	class Meta:
+		managed = False
+		db_table = 'placetype'
 
 
 class Trend(models.Model):
-    name = models.CharField(max_length=255)
-    volume = models.CharField(max_length=32, blank=True, null=True)
-    place = models.ForeignKey(Place, models.DO_NOTHING)
+	name = models.CharField(max_length=255)
+	volume = models.CharField(max_length=32, blank=True, null=True)
+	place = models.ForeignKey(Place, models.DO_NOTHING)
 
-    class Meta:
-        managed = False
-        db_table = 'trend'
+	class Meta:
+		managed = False
+		db_table = 'trend'

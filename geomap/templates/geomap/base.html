@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+	<title>GeoMap</title>	
 	{% load staticfiles %}
 
 	<meta charset="utf-8">
@@ -109,7 +110,10 @@
 
 	    <div class="collapse navbar-collapse" id = "dropdown">
 		<ul class = "nav navbar-nav navbar-left" role = "navigation">
-		 <li><a href="#"><font color=#e5e5ff><b>About</b></font></a></li>
+		  {% if user.is_authenticated %}
+		   <li><a href="{% url 'places' %}"><font color=#e5e5ff><b>Locations</b></font></a></li>
+		  {% endif %}
+		  <li><a href="#"><font color=#e5e5ff><b>About</b></font></a></li>
 		</ul>
 
 		{% if user.is_authenticated %}

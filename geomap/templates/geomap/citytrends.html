@@ -1,0 +1,16 @@
+{% extends 'geomap/base.html' %}
+
+{% block headblock %}
+{% endblock %}
+
+
+{% block content %}
+	{% for ct in citytrends %}
+		{{ ct.city }}
+		{% for trend, volume in ct.trends.iteritems %}
+			{{trend}} : {{volume}}
+
+		{% endfor %}
+	{% endfor %}
+
+{% endblock %}

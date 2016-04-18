@@ -1,0 +1,33 @@
+{% extends 'geomap/base.html' %}
+
+
+{% block headblock %}
+<style>
+	.list-group-item {
+	    position: relative;
+	    display: block;
+	    margin-bottom: -1px;
+	    border: 1px solid #ddd;
+	    line-height: 1em;
+	    text-align: center;
+	    background-color: rgba(0,26,26,0.3);
+	}
+	a {color: rgb(20,20,60);}
+</style>
+
+
+{% endblock %}
+
+{% block content %}
+	<div>
+	  <ul class='list-group row'>
+	    {% for country in countries %}
+		<a href="{% url 'citytrends' woeid=country.woeid %}">
+		<li class="list-group-item col-xs-6 col-md-4">
+		  <h3><strong>{{ country.name }}</strong></h3>
+		</li>
+		</a>
+	    {% endfor %}
+	  </ul>
+	</div>
+{% endblock %}

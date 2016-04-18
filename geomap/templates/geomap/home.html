@@ -28,12 +28,12 @@
 
 
 {% block content %}
+	{% comment %}
 	<div id='map'></div>
 	<script>
 		function rand() {
-			return (Math.random() * (0.1 + 0.1) - 0.1).toFixed(6);
+			return parseFloat((Math.random() * (0.04 + 0.04) - 0.04).toFixed(8));
 		}
-
 		L.mapbox.accessToken = 'pk.eyJ1IjoiYmFraXQiLCJhIjoiY2ltZHMzbWN'+
 			'iMDAyOHdka2toYzdkNTc4ciJ9.5nYeNUZPv2ohnoYWknNIpw';
 
@@ -51,20 +51,24 @@
 		var keys = Object.keys(trends);
 		keys.forEach(function(key){
 			if(trends[key].trends.length > 0) {
+			  var phi = 0.0;
+			  var delta = 360.0 / trends[key].trends.length;
+			  var radx = 0.02;
+			  var rady = 0.04;				
 			  trends[key].trends.forEach(function(trend) {
+				var x = radx * Math.cos(phi) + trends[key].coordinates.latitude;
+				var y = rady * Math.sin(phi) + trends[key].coordinates.longitude;
+				phi = phi + delta;
 				var popup = new L.popup({closeOnClick:false})
-					.setLatLng([trends[key].coordinates.latitude+rand(),
-							trends[key].coordinates.longitude+rand()])
+					.setLatLng([x, y])
 					.setContent(trend);
 				
 				map.addLayer(popup);
 			  });
 			};
 		});
-		
 	</script>
-
-
+	{% endcomment %}
 {% endblock %}
 
 

@@ -9,13 +9,13 @@ from django.contrib.auth import authenticate, login, logout, update_session_auth
 
 from .forms import RegisterForm, ProfileEditForm, PasswordResetForm
 from django.forms.forms import NON_FIELD_ERRORS
-from models import TrendModel
+from models import TrendModel, Place
 
-
+'''
 import json
 from django_redis import get_redis_connection
 redis = get_redis_connection('default')
-
+'''
 
 
 def init_trends():
@@ -35,8 +35,7 @@ def anonymous_required(user):
 
 # VIEWS
 def index(request):
-	#trends = json.loads(redis.get('geomap'))
-	return render(request, 'geomap/home.html', {'trends' : redis.get('geomap')})
+	return render(request, 'geomap/home.html')#, {'trends' : redis.get('geomap')})
 
 @login_required
 def logoutview(request):
@@ -108,6 +107,19 @@ def profile_delete(request):
 	except:
 		pass
 	return redirect('index')
+
+
+
+@login_required
+def places(request):
+	return render(request, 'geomap/places.html', {'countries' : Place.get_countries()})
+
+
+@login_required
+def citytrends(request, woeid):
+	return render(request, 'geomap/citytrends.html', {'citytrends' : Place.get_citytrends(woeid)})
+
+
 
 
 @user_passes_test(anonymous_required)
