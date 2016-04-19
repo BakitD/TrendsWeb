@@ -41,6 +41,7 @@ class Place(models.Model):
 	def get_citytrends(woeid):
 		citytrends = []
 		trends = {}
+		country = Place.objects.filter(woeid=woeid).first()
 		cities = Place.objects.filter(parent_id=woeid).order_by('name')
 		for city in cities:
 			trends_obj = Trend.objects.filter(place_id=city.id)

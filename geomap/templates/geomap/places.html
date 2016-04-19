@@ -10,7 +10,7 @@
 	    border: 1px solid #ddd;
 	    line-height: 1em;
 	    text-align: center;
-	    background-color: rgba(0,26,26,0.3);
+	    background-color: rgba(0,26,26,0.2);
 	}
 	a {color: rgb(20,20,60);}
 </style>
@@ -22,7 +22,7 @@
 	<div>
 	  <ul class='list-group row'>
 	    {% for country in countries %}
-		<a href="{% url 'citytrends' woeid=country.woeid %}">
+		<a href="{% url 'citytrends' country=country.name woeid=country.woeid %}">
 		<li class="list-group-item col-xs-6 col-md-4">
 		  <h3><strong>{{ country.name }}</strong></h3>
 		</li>

@@ -1,16 +1,66 @@
 {% extends 'geomap/base.html' %}
 
 {% block headblock %}
+
+<style>
+	.countryHead {
+		background-color: rgba(148, 184, 184, 0.5);
+		text-align: center;
+	}
+
+	.panel {
+		background-color: rgba(0,26,26,0.2);
+	}
+
+	.list-group-item {
+		background-color: rgba(148, 184, 184, 0.5);
+	}
+
+</style>
+
 {% endblock %}
 
 
 {% block content %}
-	{% for ct in citytrends %}
-		{{ ct.city }}
+  <div class="panel">
+
+    <div class="panel-heading countryHead">
+	<h1>{{country}}</h1>
+    </div>
+
+    <div class="panel-body row">
+	<ul class="list-group col-xs-6 col-md-4">
+	  <li class="list-group-item disabled" align=center>
+	    <font color=black>
+		<strong><i><h3>Cities</h3><i></strong>
+	    </font>
+	  </li>
+	  {% for ct in citytrends %}
+	   <a href="#{{ct.city}}" data-toggle="collapse">
+	    <li class="list-group-item" align=center>
+		<strong>{{ ct.city }}</strong>
+	    </li>
+	   </a>
+	  {% endfor %}
+	</ul>
+
+
+	<ul class="list-group col-xs-12 col-md-8">
+	  <li class="list-group-item disabled" align=center>
+	    <font color=black>
+		<strong><i><h3>Trends</h3><i></strong>
+	    </font>
+	  </li>
+	  {% for ct in citytrends %}
+	    <div id="{{ct.city}}" class="collapse">
 		{% for trend, volume in ct.trends.iteritems %}
-			{{trend}} : {{volume}}
-
+			{{ trend }} : {{ volume }} <br>
 		{% endfor %}
-	{% endfor %}
+	    </div>
+	  {% endfor %}
+	</ul>
+    </div>
 
+
+  </div>
 {% endblock %}

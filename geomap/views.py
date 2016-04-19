@@ -116,8 +116,9 @@ def places(request):
 
 
 @login_required
-def citytrends(request, woeid):
-	return render(request, 'geomap/citytrends.html', {'citytrends' : Place.get_citytrends(woeid)})
+def citytrends(request, country, woeid):
+	return render(request, 'geomap/citytrends.html', 
+			{'citytrends' : Place.get_citytrends(woeid), 'country' : country})
 
 
 
