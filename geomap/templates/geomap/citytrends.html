@@ -4,17 +4,24 @@
 
 <style>
 	.countryHead {
-		background-color: rgba(148, 184, 184, 0.5);
+		background-color: rgba(51, 51, 51, 0.5);
 		text-align: center;
+		color: black;
 	}
 
 	.panel {
 		background-color: rgba(0,26,26,0.2);
 	}
 
-	.list-group-item {
-		background-color: rgba(148, 184, 184, 0.5);
+	.ctHead {
+		background-color: rgba(51, 51, 51, 0.5);
+		text-align: center;
 	}
+
+	.list-group-item {
+		background-color: rgba(148, 184, 184, 0.3);
+	}
+	a {color: rgb(0, 85, 128);}
 
 </style>
 
@@ -30,7 +37,7 @@
 
     <div class="panel-body row">
 	<ul class="list-group col-xs-6 col-md-4">
-	  <li class="list-group-item disabled" align=center>
+	  <li class="list-group-item ctHead" data-toggle="tooltip" title="Check city to see trends">
 	    <font color=black>
 		<strong><i><h3>Cities</h3><i></strong>
 	    </font>
@@ -38,7 +45,7 @@
 	  {% for ct in citytrends %}
 	   <a href="#{{ct.city}}" data-toggle="collapse">
 	    <li class="list-group-item" align=center>
-		<strong>{{ ct.city }}</strong>
+		<strong><h4>{{ ct.city }}</h4></strong>
 	    </li>
 	   </a>
 	  {% endfor %}
@@ -46,16 +53,30 @@
 
 
 	<ul class="list-group col-xs-12 col-md-8">
-	  <li class="list-group-item disabled" align=center>
+	  <li class="list-group-item ctHead">
 	    <font color=black>
 		<strong><i><h3>Trends</h3><i></strong>
 	    </font>
 	  </li>
 	  {% for ct in citytrends %}
 	    <div id="{{ct.city}}" class="collapse">
-		{% for trend, volume in ct.trends.iteritems %}
-			{{ trend }} : {{ volume }} <br>
+	      <ul class="list-group">
+		<li class="list-group-item list-group-item-success">
+			<h3>{{ ct.city }}</h3>
+		</li>
+		{% for trend in ct.trends %}
+		  <li class="list-group-item">
+			<strong>{{ trend.0 }}</strong>
+			<span class="badge">
+			{% if not trend.1 %}
+				n/a
+			{% else %}
+				{{ trend.1 }}
+			{% endif %}
+			</span>
+		  </li>
 		{% endfor %}
+	      </ul>
 	    </div>
 	  {% endfor %}
 	</ul>

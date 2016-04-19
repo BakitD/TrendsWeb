@@ -8,6 +8,7 @@
 from __future__ import unicode_literals
 from djgeojson.fields import PointField
 from django.db import models
+from operator import itemgetter
 
 class TrendModel(models.Model):
 	geom = PointField()
@@ -40,13 +41,17 @@ class Place(models.Model):
 	@staticmethod
 	def get_citytrends(woeid):
 		citytrends = []
-		trends = {}
 		country = Place.objects.filter(woeid=woeid).first()
 		cities = Place.objects.filter(parent_id=woeid).order_by('name')
+		trends = []
 		for city in cities:
 			trends_obj = Trend.objects.filter(place_id=city.id)
-			for t in trends_obj: trends[t.name] = t.volume
-			citytrends.append({'city' : city.name, 'trends' : trends})
+			trends = []
+			for t in trends_obj:
+				if t.volume: trends.append((t.name, int(t.volume)))
+				else: trends.append((t.name, t.volume))
+			citytrends.append({'city' : city.name, \
+				'trends' : sorted(trends, key=itemgetter(1), reverse=True)})
 		return citytrends
 
 
