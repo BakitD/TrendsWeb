@@ -43,7 +43,7 @@
 	    </font>
 	  </li>
 	  {% for ct in citytrends %}
-	   <a href="#{{ct.city}}" data-toggle="collapse">
+	   <a href="#{{ct.city_tag}}" data-toggle="collapse">
 	    <li class="list-group-item" align=center>
 		<strong><h4>{{ ct.city }}</h4></strong>
 	    </li>
@@ -59,7 +59,7 @@
 	    </font>
 	  </li>
 	  {% for ct in citytrends %}
-	    <div id="{{ct.city}}" class="collapse">
+	    <div id="{{ct.city_tag}}" class="collapse">
 	      <ul class="list-group">
 		<li class="list-group-item list-group-item-success">
 			<h3>{{ ct.city }}</h3>

@@ -46,12 +46,14 @@ class Place(models.Model):
 		trends = []
 		for city in cities:
 			trends_obj = Trend.objects.filter(place_id=city.id)
+			if not trends_obj: continue
 			trends = []
 			for t in trends_obj:
 				if t.volume: trends.append((t.name, int(t.volume)))
 				else: trends.append((t.name, t.volume))
-			citytrends.append({'city' : city.name, \
+			citytrends.append({'city' : city.name, 'city_tag' : city.name.replace(' ', '_'),\
 				'trends' : sorted(trends, key=itemgetter(1), reverse=True)})
+			if city.name == 'Santo Domingo': print citytrends
 		return citytrends
 
 
@@ -69,6 +71,7 @@ class Trend(models.Model):
 	name = models.CharField(max_length=255)
 	volume = models.CharField(max_length=32, blank=True, null=True)
 	place = models.ForeignKey(Place, models.DO_NOTHING)
+	dtime = models.DateTimeField()
 
 	class Meta:
 		managed = False

@@ -11,23 +11,11 @@ from .forms import RegisterForm, ProfileEditForm, PasswordResetForm
 from django.forms.forms import NON_FIELD_ERRORS
 from models import TrendModel, Place
 
-'''
-import json
+
+'''import json
 from django_redis import get_redis_connection
 redis = get_redis_connection('default')
 '''
-
-
-def init_trends():
-	data = json.loads(redis.get('geomap'))
-	'''for woeid, d in data.iteritems():
-		if d['trends']:
-			print woeid, ', lnlt:, ',(d['coordinates']), ' trends: ', d['trends']
-	'''
-
-#TODO to another file
-#init_trends()
-
 
 # SELF-DEFINED FUNCTIONS
 def anonymous_required(user):
@@ -36,6 +24,9 @@ def anonymous_required(user):
 # VIEWS
 def index(request):
 	return render(request, 'geomap/home.html')#, {'trends' : redis.get('geomap')})
+
+
+
 
 @login_required
 def logoutview(request):
