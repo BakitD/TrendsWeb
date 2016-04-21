@@ -23,6 +23,7 @@
 	}
 	a {color: rgb(0, 85, 128);}
 
+
 </style>
 
 {% endblock %}
@@ -39,13 +40,13 @@
 	<ul class="list-group col-xs-6 col-md-4">
 	  <li class="list-group-item ctHead" data-toggle="tooltip" title="Check city to see trends">
 	    <font color=black>
-		<strong><i><h3>Cities</h3><i></strong>
+		<strong><i><h3>Places</h3><i></strong>
 	    </font>
 	  </li>
-	  {% for ct in citytrends %}
-	   <a href="#{{ct.city_tag}}" data-toggle="collapse">
+	  {% for ct in placetrends %}
+	   <a href="#{{ct.place_tag}}" data-toggle="collapse">
 	    <li class="list-group-item" align=center>
-		<strong><h4>{{ ct.city }}</h4></strong>
+		<strong><h4>{{ ct.place }}</h4></strong>
 	    </li>
 	   </a>
 	  {% endfor %}
@@ -58,15 +59,26 @@
 		<strong><i><h3>Trends</h3><i></strong>
 	    </font>
 	  </li>
-	  {% for ct in citytrends %}
-	    <div id="{{ct.city_tag}}" class="collapse">
+	{%comment%}
+	  <li  class="list-group-item">
+
+	    <div class="btn-toolbar" role="toolbar" aria-label="...">
+		<div class="btn-group btn-default" role="group" aria-label="...">Some data</div>
+	    </div>
+	 
+	  </li>
+	{%endcomment%}
+
+	  {% for ct in placetrends %}
+	    <div id="{{ct.place_tag}}" class="collapse">
 	      <ul class="list-group">
-		<li class="list-group-item list-group-item-success">
-			<h3>{{ ct.city }}</h3>
+		<li class="list-group-item list-group-item-success" align="center">
+			<h3>{{ ct.place }}</h3>
 		</li>
 		{% for trend in ct.trends %}
-		  <li class="list-group-item">
+		  <li class="list-group-item" align="center">
 			<strong>{{ trend.0 }}</strong>
+			{% comment %}			
 			<span class="badge">
 			{% if not trend.1 %}
 				n/a
@@ -74,6 +86,7 @@
 				{{ trend.1 }}
 			{% endif %}
 			</span>
+			{% endcomment %}
 		  </li>
 		{% endfor %}
 	      </ul>

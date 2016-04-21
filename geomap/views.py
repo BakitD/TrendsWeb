@@ -108,8 +108,10 @@ def places(request):
 
 @login_required
 def citytrends(request, country, woeid):
-	return render(request, 'geomap/citytrends.html', 
-			{'citytrends' : Place.get_citytrends(woeid), 'country' : country})
+	places = Place.get_citytrends(woeid)
+	country_data = Place.get_countrytrends(woeid)
+	if country_data.get('trends'): places.insert(0, country_data)
+	return render(request, 'geomap/citytrends.html', {'placetrends' : places, 'country' : country})
 
 
 

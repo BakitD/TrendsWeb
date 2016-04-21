@@ -54,10 +54,22 @@ class Place(models.Model):
 			for t in trends_obj:
 				if t.volume: trends.append((t.name, int(t.volume)))
 				else: trends.append((t.name, t.volume))
-			citytrends.append({'city' : city.name, 'city_tag' : city.name.replace(' ', '_'),\
+			citytrends.append({'place' : city.name, 'place_tag' : city.name.replace(' ', '_'),\
 				'trends' : sorted(trends, key=itemgetter(1), reverse=True)})
-			if city.name == 'Santo Domingo': print citytrends
 		return citytrends
+
+
+	@staticmethod
+	def get_countrytrends(woeid):
+		trends = []
+		country = Place.objects.filter(woeid=woeid).first()
+		trends_obj = Trend.objects.filter(place_id=country.id)
+		for t in trends_obj:
+			if t.volume: trends.append((t.name, int(t.volume)))
+			else: trends.append((t.name, t.volume))
+		return {'place' : country.name, 'place_tag' : country.name.replace(' ', '_'),\
+				'trends' : sorted(trends, key=itemgetter(1), reverse=True)}
+			
 
 
 
