@@ -27,6 +27,9 @@ class Place(models.Model):
 	dtime = models.DateTimeField()
 	placetype = models.ForeignKey('Placetype', models.DO_NOTHING)
 
+	def __unicode__(self):
+		return u'{0} ({1})'.format(self.name, self.woeid)
+
 	class Meta:
 		managed = False
 		db_table = 'place'
@@ -66,6 +69,9 @@ class Placetype(models.Model):
 		managed = False
 		db_table = 'placetype'
 
+	def __unicode__(self):
+		return u'{0}'.format(self.name)
+
 
 class Trend(models.Model):
 	name = models.CharField(max_length=255)
@@ -76,3 +82,8 @@ class Trend(models.Model):
 	class Meta:
 		managed = False
 		db_table = 'trend'
+
+
+	def __unicode__(self):
+		return u'{0}'.format(self.name)
+
