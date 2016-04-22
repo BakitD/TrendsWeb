@@ -10,6 +10,10 @@ from djgeojson.fields import PointField
 from django.db import models
 from operator import itemgetter
 
+from datetime import datetime, timedelta
+
+from .settings import DATETIME_FORMAT, TREND_STORE_DAYS, TREND_UPDATE_FREQ
+
 class TrendModel(models.Model):
 	geom = PointField()
 	name = models.TextField()
@@ -48,29 +52,26 @@ class Place(models.Model):
 		cities = Place.objects.filter(parent_id=woeid).order_by('name')
 		trends = []
 		for city in cities:
-			trends_obj = Trend.objects.filter(place_id=city.id)
-			if not trends_obj: continue
-			trends = []
-			for t in trends_obj:
-				if t.volume: trends.append((t.name, int(t.volume)))
-				else: trends.append((t.name, t.volume))
-			citytrends.append({'place' : city.name, 'place_tag' : city.woeid,\
-				'trends' : sorted(trends, key=itemgetter(1), reverse=True), 'woeid' : city.woeid})
+			dtrange = [city.dtime - timedelta(hours=TREND_UPDATE_FREQ), city.dtime]
+			trends = Trend.objects.filter(place_id=city.id, dtime__range=dtrange).values('name', 'volume')
+			if not trends: continue
+			citytrends.append({'place' : city.name, 'place_tag' : city.woeid, 'woeid' : city.woeid,
+				'trends' : sorted(trends, key=city.sort_place, reverse=True)})
 		return citytrends
 
 
 	@staticmethod
 	def get_countrytrends(woeid):
-		trends = []
 		country = Place.objects.filter(woeid=woeid).first()
-		trends_obj = Trend.objects.filter(place_id=country.id)
-		for t in trends_obj:
-			if t.volume: trends.append((t.name, int(t.volume)))
-			else: trends.append((t.name, t.volume))
-		return {'place' : country.name, 'place_tag' : country.woeid,\
-				'trends' : sorted(trends, key=itemgetter(1), reverse=True), 'woeid' : country.woeid}
+		start_dtime = country.dtime - timedelta(hours=TREND_UPDATE_FREQ)
+		trends = Trend.objects.values('name', 'volume').filter(place_id=country.id,
+					dtime__range=[start_dtime, country.dtime])
+		return {'place' : country.name, 'place_tag' : country.woeid, 'woeid' : country.woeid,
+				'trends' : sorted(trends, key=country.sort_place, reverse=True)}
 			
-
+	def sort_place(self, element):
+		value = element.get('volume') or 0
+		return int(value)
 
 
 
@@ -98,4 +99,22 @@ class Trend(models.Model):
 
 	def __unicode__(self):
 		return u'{0}'.format(self.name)
+
+
+	@staticmethod
+	def get_weektrends(woeid):
+		start_date = (datetime.now() - timedelta(days=TREND_STORE_DAYS)).strftime(DATETIME_FORMAT)
+		end_date = datetime.now().strftime(DATETIME_FORMAT)
+		place = Place.objects.filter(woeid=woeid).first()
+		trends_obj = Trend.objects.filter(dtime__range=[start_date, end_date], place_id=place.id)
+		days_counter = TREND_STORE_DAYS
+		for trend in trends_obj:
+			print trend.dtime, trend.name
+
+		return 0
+		
+
+
+
+
 

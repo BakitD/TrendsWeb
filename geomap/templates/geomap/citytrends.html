@@ -98,15 +98,14 @@
 		</li>
 		{% for trend in ct.trends %}
 		  <li class="list-group-item" align="center">
-			<strong>{{ trend.0 }}</strong>
-			{% comment %}			
+			<strong>{{ trend.name }}</strong>
+			{% comment %}	
 			<span class="badge">
-				{% if not trend.1 %}	n/a
-				{% else %}	{{ trend.1 }}
+				{% if not trend.volume %}	n/a
+				{% else %}	{{ trend.volume }}
 				{% endif %}
 			</span>
 			{% endcomment %}
-
 		  </li>
 		{% endfor %}
 	      </ul>

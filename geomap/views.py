@@ -9,7 +9,7 @@ from django.contrib.auth import authenticate, login, logout, update_session_auth
 
 from .forms import RegisterForm, ProfileEditForm, PasswordResetForm
 from django.forms.forms import NON_FIELD_ERRORS
-from models import TrendModel, Place
+from models import TrendModel, Place, Trend
 
 
 '''import json
@@ -115,7 +115,8 @@ def citytrends(request, country, woeid):
 
 @login_required
 def placehistory(request, place, woeid):
-	return render(request, 'geomap/placehistory.html')
+	trends = Trend.get_weektrends(woeid)
+	return render(request, 'geomap/placehistory.html', {'place' : place, 'trends' : trends})
 
 
 
