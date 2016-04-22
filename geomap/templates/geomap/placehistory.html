@@ -2,7 +2,8 @@
 
 {% block headblock %}
 	<style>
-		.countryHead {
+
+	.countryHead {
 		background-color: rgba(51, 51, 51, 0.5);
 		text-align: center;
 		color: black;
@@ -11,6 +12,28 @@
 		background-color: rgba(0,26,26,0.2);
 	}
 
+	.list-group-item {
+		background-color: rgba(148, 184, 184, 0.3);
+	}
+	.lstHead {
+		background-color: rgba(0, 51, 102, 0.3);
+	}
+	.carousel-indicators {
+		top: 99%;
+	}
+	.carousel-indicators li {
+		background-color: rgba(30, 30, 9,0.7);
+		border-color: none;
+		width: 18px;
+		height: 18px;
+	        
+	}
+	.carousel-indicators .active {
+		background-color: rgba(153, 0, 51,0.9);
+		border-color: none;
+		width: 25px;
+		height: 15px;
+	}
 	</style>
 
 
@@ -24,36 +47,50 @@
     </div>
 
     <div class="panel-body">
-	{{ trends }}
 	<div id="myCarousel" class="carousel slide" data-ride="carousel">
-	  <!-- Indicators -->
-	  <ol class="carousel-indicators">
-	    <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-	    <li data-target="#myCarousel" data-slide-to="1"></li>
-
+	 <ol class="carousel-indicators">
+	    {% for day in week_trends %}
+	      {% if day.trends %}
+		{% if forloop.first %}
+		  <li data-target="#myCarousel" data-slide-to="{{day.day_id}}" data-toggle="tooltip"
+				title="{{day.datetime}}" class="active"></li>
+		{% else %}
+	          <li data-target="#myCarousel" data-slide-to="{{day.day_id}}"  data-toggle="tooltip"
+				title="{{day.datetime}}"></li>
+		{% endif %}
+	      {% endif %}
+	    {% endfor %}
 	  </ol>
 
-	  <!-- Wrapper for slides -->
 	  <div class="carousel-inner" role="listbox">
-	    <div class="item active">
-	      <img src="img_chania.jpg" alt="Chania">
-	    </div>
-
-	    <div class="item">
-	      <img src="img_chania2.jpg" alt="Chania">
-	    </div>
-
+	     {% for day in week_trends %}
+	      {% if day.trends %}
+		{% if forloop.first %}<div class="item active">{% else %}<div class="item ">{% endif %}
+		    <ul class="list-group">
+		       <li class="list-group-item lstHead" align="center">
+		           <h3>{{ day.datetime }}'s trends</h3>
+		       <li>
+			{% for trend in day.trends %}
+		          <li class="list-group-item list-group-item-success" align="center">
+		              <strong>{{ trend.name }}</strong>
+		          </li>
+			{% endfor %}
+		    </ul>
+		</div>
+	       {% endif %}
+	      {% endfor %}
 	  </div>
 
 	  <!-- Left and right controls -->
-	  <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+	   <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
 	    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
 	    <span class="sr-only">Previous</span>
-	  </a>
-	  <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+	   </a>
+	   <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
 	    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
 	    <span class="sr-only">Next</span>
-	  </a>
+	   </a>
+
 	</div>
 
     </div>

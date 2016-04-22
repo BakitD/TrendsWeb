@@ -12,7 +12,7 @@ from operator import itemgetter
 
 from datetime import datetime, timedelta
 
-from .settings import DATETIME_FORMAT, TREND_STORE_DAYS, TREND_UPDATE_FREQ
+from .settings import DATETIME_FORMAT, TREND_STORE_DAYS, TREND_UPDATE_FREQ, DATE_FORMAT, USER_DATE_FORMAT
 
 class TrendModel(models.Model):
 	geom = PointField()
@@ -52,7 +52,7 @@ class Place(models.Model):
 		cities = Place.objects.filter(parent_id=woeid).order_by('name')
 		trends = []
 		for city in cities:
-			dtrange = [city.dtime - timedelta(hours=TREND_UPDATE_FREQ), city.dtime]
+			dtrange = [city.dtime.date(), city.dtime]
 			trends = Trend.objects.filter(place_id=city.id, dtime__range=dtrange).values('name', 'volume')
 			if not trends: continue
 			citytrends.append({'place' : city.name, 'place_tag' : city.woeid, 'woeid' : city.woeid,
@@ -63,9 +63,8 @@ class Place(models.Model):
 	@staticmethod
 	def get_countrytrends(woeid):
 		country = Place.objects.filter(woeid=woeid).first()
-		start_dtime = country.dtime - timedelta(hours=TREND_UPDATE_FREQ)
 		trends = Trend.objects.values('name', 'volume').filter(place_id=country.id,
-					dtime__range=[start_dtime, country.dtime])
+					dtime__range=[country.dtime.date(), country.dtime])
 		return {'place' : country.name, 'place_tag' : country.woeid, 'woeid' : country.woeid,
 				'trends' : sorted(trends, key=country.sort_place, reverse=True)}
 			
@@ -103,16 +102,19 @@ class Trend(models.Model):
 
 	@staticmethod
 	def get_weektrends(woeid):
-		start_date = (datetime.now() - timedelta(days=TREND_STORE_DAYS)).strftime(DATETIME_FORMAT)
-		end_date = datetime.now().strftime(DATETIME_FORMAT)
 		place = Place.objects.filter(woeid=woeid).first()
-		trends_obj = Trend.objects.filter(dtime__range=[start_date, end_date], place_id=place.id)
-		days_counter = TREND_STORE_DAYS
-		for trend in trends_obj:
-			print trend.dtime, trend.name
+		end_date = place.dtime
+		days_counter = 0
+		week_trends = []
+		while days_counter < TREND_STORE_DAYS:
+			trends = Trend.objects.filter(place_id=place.id,
+				dtime__range=[end_date.date(), end_date]).values('name', 'volume')
+			week_trends.append({'datetime':end_date.strftime(USER_DATE_FORMAT), 'day_id' : days_counter,
+					'trends' : sorted(trends, key=place.sort_place, reverse=True)})
+			end_date = end_date - timedelta(days=1)
+			days_counter += 1
+		return week_trends
 
-		return 0
-		
 
 
 
