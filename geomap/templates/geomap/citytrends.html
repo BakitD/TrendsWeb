@@ -23,6 +23,15 @@
 	}
 	a {color: rgb(0, 85, 128);}
 
+	.glyphSt {
+		color:#009900;
+		
+	}
+	.placeTagSt {
+		color:#993399;
+		font-weight: bold;
+	}
+
 
 </style>
 
@@ -44,11 +53,13 @@
 	    </font>
 	  </li>
 	  {% for ct in placetrends %}
-	   <a href="#{{ct.place_tag}}" data-toggle="collapse">
+	   
 	    <li class="list-group-item" align=center>
-		<strong><h4>{{ ct.place }}</h4></strong>
+		<a href="#{{ct.place_tag}}" data-toggle="collapse">
+		  <strong><h4>{{ ct.place }}</h4></strong>
+		</a>
+		
 	    </li>
-	   </a>
 	  {% endfor %}
 	</ul>
 
@@ -59,34 +70,43 @@
 		<strong><i><h3>Trends</h3><i></strong>
 	    </font>
 	  </li>
-	{%comment%}
-	  <li  class="list-group-item">
-
-	    <div class="btn-toolbar" role="toolbar" aria-label="...">
-		<div class="btn-group btn-default" role="group" aria-label="...">Some data</div>
-	    </div>
-	 
-	  </li>
-	{%endcomment%}
 
 	  {% for ct in placetrends %}
 	    <div id="{{ct.place_tag}}" class="collapse">
 	      <ul class="list-group">
 		<li class="list-group-item list-group-item-success" align="center">
-			<h3>{{ ct.place }}</h3>
+		  <div class="row">
+		    <div class="col-sm-6 col-md-4">
+			
+			<a href="{% url 'placehistory' place=ct.place woeid=ct.woeid %}"
+				data-toggle="tooltip" title="See trends history for {{ct.place}} !">
+				<h3><span class="glyphicon glyphicon-cloud glyphSt"></span></h3>
+			</a>
+			
+		    </div>
+		    <div class="col-sm-6 col-md-4" align="center">
+			<div class="placeTagSt"><h3>{{ ct.place }}</h3></div>
+		    </div>
+		    <div class="col-sm-6 col-md-4">
+		      <div id="{{ct.place_tag}}" class="collapse in">
+			<a href="#{{ct.place_tag}}" data-toggle="collapse">
+				<h3><span class="glyphicon glyphicon-arrow-up"></span></h3>
+			</a>
+		      </div>
+		    </div>
+		  </div>
 		</li>
 		{% for trend in ct.trends %}
 		  <li class="list-group-item" align="center">
 			<strong>{{ trend.0 }}</strong>
 			{% comment %}			
 			<span class="badge">
-			{% if not trend.1 %}
-				n/a
-			{% else %}
-				{{ trend.1 }}
-			{% endif %}
+				{% if not trend.1 %}	n/a
+				{% else %}	{{ trend.1 }}
+				{% endif %}
 			</span>
 			{% endcomment %}
+
 		  </li>
 		{% endfor %}
 	      </ul>

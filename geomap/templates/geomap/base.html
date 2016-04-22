@@ -111,18 +111,22 @@
 	    </div><!-- End Navbar Header-->
 
 	    <div class="collapse navbar-collapse" id = "dropdown">
-		<ul class = "nav navbar-nav navbar-left" role = "navigation">
-		  {% if user.is_authenticated %}
-		   <li><a href="{% url 'places' %}"><font color=#e5e5ff><b>Locations</b></font></a></li>
-		  {% endif %}
-		  <li><a href="#"><font color=#e5e5ff><b>About</b></font></a></li>
-		</ul>
-
 		{% if user.is_authenticated %}
 			<ul class = "nav navbar-nav navbar-left" role = "navigation">
 			 <li><a href="{% url 'profile' %}"><font color=darkorange><b>Profile</b></font></a></li>
 			</ul>
 		{% endif %}
+		<ul class = "nav navbar-nav navbar-left" role = "navigation">
+		  {% if user.is_authenticated %}
+		    <li>
+		      <a href="{% url 'places' %}">
+				<span class="glyphicon glyphicon-globe" style="color:#2eb8b8"></span>
+				<font color=#e5e5ff><b>Locations</b></font>
+		      </a>
+		    </li>
+		  {% endif %}
+		  <li><a href="#"><font color=#e5e5ff><b>About</b></font></a></li>
+		</ul>
 	    </div><!-- End Nav Contents -->
 
 

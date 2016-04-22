@@ -54,8 +54,8 @@ class Place(models.Model):
 			for t in trends_obj:
 				if t.volume: trends.append((t.name, int(t.volume)))
 				else: trends.append((t.name, t.volume))
-			citytrends.append({'place' : city.name, 'place_tag' : city.name.replace(' ', '_'),\
-				'trends' : sorted(trends, key=itemgetter(1), reverse=True)})
+			citytrends.append({'place' : city.name, 'place_tag' : city.woeid,\
+				'trends' : sorted(trends, key=itemgetter(1), reverse=True), 'woeid' : city.woeid})
 		return citytrends
 
 
@@ -67,8 +67,8 @@ class Place(models.Model):
 		for t in trends_obj:
 			if t.volume: trends.append((t.name, int(t.volume)))
 			else: trends.append((t.name, t.volume))
-		return {'place' : country.name, 'place_tag' : country.name.replace(' ', '_'),\
-				'trends' : sorted(trends, key=itemgetter(1), reverse=True)}
+		return {'place' : country.name, 'place_tag' : country.woeid,\
+				'trends' : sorted(trends, key=itemgetter(1), reverse=True), 'woeid' : country.woeid}
 			
 
 

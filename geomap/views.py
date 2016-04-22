@@ -113,6 +113,10 @@ def citytrends(request, country, woeid):
 	if country_data.get('trends'): places.insert(0, country_data)
 	return render(request, 'geomap/citytrends.html', {'placetrends' : places, 'country' : country})
 
+@login_required
+def placehistory(request, place, woeid):
+	return render(request, 'geomap/placehistory.html')
+
 
 
 

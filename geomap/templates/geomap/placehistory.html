@@ -1,0 +1,25 @@
+{% extends 'geomap/base.html' %}
+
+{% block headblock %}
+	<style>
+		.countryHead {
+		background-color: rgba(51, 51, 51, 0.5);
+		text-align: center;
+		color: black;
+	}
+	</style>
+
+
+{% endblock %}
+
+{% block content %}
+ <div class="panel">
+
+    <div class="panel-heading countryHead">
+	<h1>{{country}}</h1>
+    </div>
+
+
+ </div>
+
+{% endblock %}
