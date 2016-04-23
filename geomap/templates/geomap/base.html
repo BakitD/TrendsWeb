@@ -9,7 +9,6 @@
 	<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	
-
 	{% load bootstrap3 %}
 	{% bootstrap_css %}
 	{% bootstrap_javascript %}	
@@ -18,11 +17,12 @@
 	<style>
 		body{
 			padding-top: 50px;
-			background-image: url('{{STATIC_URL}}geomap/world_map.gif');
+			background-image: url('{{STATIC_URL}}geomap/images/world_map.gif');
 			background-size: 100%;
 			background-repeat: no-repeat;
 		}
 		.nvbspace {padding: 10px; border-radius: 15px;}
+		.helloSt {color: white;}
 	</style>
 
 	{% block headblock %}
@@ -32,13 +32,14 @@
 </head>
 
 <body>
-    <header class = "navbar navbar-inverse navbar-fixed-top">
+    <header class = "navbar navbar-inverse navbar-fixed-top" id="ajax_reload">
 	<div class = "container">
-
-
-	    <div class="navbar-brand pull-right">
+	    <div class="pull-right"
+		{% if not user.is_authenticated %} style="margin-top:-3px;" {%else%} style="margin-top:5px;" {% endif %}>
 	     {% if not user.is_authenticated %}
-		<form action="{% url 'loginview'%}" method="post">
+		<script src="{% static 'geomap/js/login.js' %}"></script>
+		<form role="form" id="login" class="unauthorized">
+		  <div class="modal-body">
 		   {% csrf_token %}
 		   {% if login_errors %}
 		      <div class="dropdown open pull-right">
@@ -65,13 +66,13 @@
 				    <li class="dropdown-header"><font color="black"><b>login</b></font></li>
 				    <li>
 					<font color="black">
-						<input type="text" name="username" value="" />
+						<input type="text" name="username" value=""  id="username"/>
 					</font>
 				    </li>
 				    <li class="dropdown-header"><font color="black"><b>password</b></font></li>
 				    <li>
 					<font color="black">
-						<input type="password" name="password" value="" />
+						<input type="password" name="password" value="" id="password"/>
 					</font>					
 				    </li>
 				    <p>
@@ -89,11 +90,16 @@
 				    </li>
 				  </ul>
 		      </div>
+		  </div>
 		</form>
-	     {% else %}
-		<h4>Hello, {{ user.first_name }}</h4>
-		<a href="{% url 'logoutview' %}" class="btn-primary btn-sm"><b>Logout</b></a>
-	     {% endif %}
+		{% endif %}
+		<div {% if not user.is_authenticated %} class='authorized' style='display: none;' {%endif %}>
+			<h4><span class="helloSt">Hello,&nbsp;
+				<span id="user_name">{% if user.is_authenticated %} {{ user.first_name }} {% endif %}</span>
+			</span>
+			&nbsp;<a href="{% url 'logoutview' %}" class="btn-primary btn-sm"><b>Logout</b></a>
+</h4>
+		</div>
 	    </div><!-- End navbar input-->
 
 
@@ -111,27 +117,32 @@
 	    </div><!-- End Navbar Header-->
 
 	    <div class="collapse navbar-collapse" id = "dropdown">
-		{% if user.is_authenticated %}
-			<ul class = "nav navbar-nav navbar-left" role = "navigation">
-			 <li><a href="{% url 'profile' %}"><font color=darkorange><b>Profile</b></font></a></li>
-			</ul>
-		{% endif %}
+		
 		<ul class = "nav navbar-nav navbar-left" role = "navigation">
-		  {% if user.is_authenticated %}
-		    <li>
-		      <a href="{% url 'places' %}">
+		 <li {% if not user.is_authenticated %} class="authorized" style="display: none;" {% endif %} >
+			<a href="{% url 'profile' %}">
+				<font color=darkorange><b>Profile</b></font>
+			</a>
+		 </li>
+		<li {% if not user.is_authenticated %} class="authorized" style="display: none;" {% endif %} >
+			<a href="{% url 'places' %}">
 				<span class="glyphicon glyphicon-globe" style="color:#2eb8b8"></span>
 				<font color=#e5e5ff><b>Locations</b></font>
-		      </a>
-		    </li>
-		  {% endif %}
-		  <li><a href="#"><font color=#e5e5ff><b>About</b></font></a></li>
+			</a>
+		</li>
+
+		    <li><a href="#"><font color=#e5e5ff><b>About</b></font></a></li>
+		 
 		</ul>
 	    </div><!-- End Nav Contents -->
 
 
 	</div><!-- End Container -->
     </header>
+
+
+
+
 	{% block content %} <!--> IT'S BETTER NOT TO USE THIS BLOCK )) <!-->
 	{% endblock %}
 	{% block footer %}

@@ -11,8 +11,9 @@ from .forms import RegisterForm, ProfileEditForm, PasswordResetForm
 from django.forms.forms import NON_FIELD_ERRORS
 from models import TrendModel, Place, Trend
 
+import json
 
-'''import json
+'''
 from django_redis import get_redis_connection
 redis = get_redis_connection('default')
 '''
@@ -23,9 +24,9 @@ def anonymous_required(user):
 
 # VIEWS
 def index(request):
-	return render(request, 'geomap/home.html')#, {'trends' : redis.get('geomap')})
-
-
+	#trends = redis.get('geomap')
+	#trends = dict(json.loads(redis.get('geomap')).items()[:15])
+	return render(request, 'geomap/home.html')#, {'trends' : json.dumps(trends)})
 
 
 @login_required
@@ -36,16 +37,20 @@ def logoutview(request):
 
 @user_passes_test(anonymous_required)
 def loginview(request):
-	login_errors = []
-	if request.method == 'POST':
-		username = request.POST.get('username')
-		password = request.POST.get('password')
-		user = authenticate(username=username, password=password)
-		if not user:
-			login_errors.append('Invalid credentials')
-		elif user.is_active:
-			login(request, user)
-	return render(request, 'geomap/home.html', {'login_errors' : login_errors})
+	if request.is_ajax():
+		login_errors = []
+		if request.method == 'POST':
+			username = request.POST.get('username')
+			password = request.POST.get('password')
+			user = authenticate(username=username, password=password)
+			if not user:
+				login_errors.append('Invalid credentials')
+			elif user.is_active:
+				login(request, user)
+		return HttpResponse(json.dumps({'login_errors':login_errors, 'user_name': user.username}),
+					content_type='application/json')
+	else:
+		raise Http404
 
 
 

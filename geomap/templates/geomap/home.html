@@ -20,8 +20,10 @@
 		  color: white;
 		  background-color: rgba(20,20,20,0.7);
 		  border-color: rgb(21,21,21);
+		 
 		}
-
+		.leaflet-popup-content {padding: 1px; font-size: 14px; text-align: center;padding-bottom:10px;}
+		.leaflet-popup-tip {visibility:hidden;}
 	</style>
 
 {% endblock %}
@@ -32,7 +34,7 @@
 	<div id='map'></div>
 	<script>
 		function rand() {
-			return parseFloat((Math.random() * (0.04 + 0.04) - 0.04).toFixed(8));
+			return parseFloat((Math.random() * (0.02 + 0.02) - 0.02).toFixed(8));
 		}
 		L.mapbox.accessToken = 'pk.eyJ1IjoiYmFraXQiLCJhIjoiY2ltZHMzbWN'+
 			'iMDAyOHdka2toYzdkNTc4ciJ9.5nYeNUZPv2ohnoYWknNIpw';
@@ -44,7 +46,7 @@
 
 		var map = L.map('map', { zoomControl: false, closePopupOnClick : false })
     			.addLayer(mapboxTiles)
-    			.setView([25.0, 50], 4);
+    			.setView([40,2], 3);
 		new L.Control.Zoom({ position: 'bottomright' }).addTo(map);
 
 		var trends = {{ trends|safe }};
@@ -56,8 +58,8 @@
 			  var radx = 0.02;
 			  var rady = 0.04;				
 			  trends[key].trends.forEach(function(trend) {
-				var x = radx * Math.cos(phi) + trends[key].coordinates.latitude;
-				var y = rady * Math.sin(phi) + trends[key].coordinates.longitude;
+				var x = radx * Math.cos(phi) + parseFloat(trends[key].coordinates.latitude);
+				var y = rady * Math.sin(phi) + parseFloat(trends[key].coordinates.longitude);
 				phi = phi + delta;
 				var popup = new L.popup({closeOnClick:false})
 					.setLatLng([x, y])
