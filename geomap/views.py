@@ -12,10 +12,10 @@ from django.forms.forms import NON_FIELD_ERRORS
 from models import TrendModel, Place, Trend
 
 
-'''import json
+import json
 from django_redis import get_redis_connection
 redis = get_redis_connection('default')
-'''
+
 
 # SELF-DEFINED FUNCTIONS
 def anonymous_required(user):
@@ -23,10 +23,9 @@ def anonymous_required(user):
 
 # VIEWS
 def index(request):
-	return render(request, 'geomap/home.html')#, {'trends' : redis.get('geomap')})
-
-
-
+	#trends = redis.get('geomap')
+	trends = dict(json.loads(redis.get('geomap')).items()[:15])
+	return render(request, 'geomap/home.html', {'trends' : json.dumps(trends)})
 
 @login_required
 def logoutview(request):

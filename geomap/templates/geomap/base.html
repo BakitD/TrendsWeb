@@ -23,6 +23,7 @@
 			background-repeat: no-repeat;
 		}
 		.nvbspace {padding: 10px; border-radius: 15px;}
+		.helloTag {margin-top: 16px; color: #ffffff;}
 	</style>
 
 	{% block headblock %}
@@ -36,7 +37,7 @@
 	<div class = "container">
 
 
-	    <div class="navbar-brand pull-right">
+	    <div class="pull-right">
 	     {% if not user.is_authenticated %}
 		<form action="{% url 'loginview'%}" method="post">
 		   {% csrf_token %}
@@ -45,7 +46,7 @@
 		   {% else %}
 		      <div class="dropdown pull-right">
 		   {% endif %}
-			  <button class="btn btn-primary btn-sm dropdown-toggle" 
+			  <button class="btn btn-primary btn-sm dropdown-toggle helloTag" 
 					type="button" data-toggle="dropdown">Log In
 			  		<span class="caret"></span></button>
 				  <ul class="dropdown-menu nvbspace">
@@ -91,8 +92,11 @@
 		      </div>
 		</form>
 	     {% else %}
-		<h4>Hello, {{ user.first_name }}</h4>
-		<a href="{% url 'logoutview' %}" class="btn-primary btn-sm"><b>Logout</b></a>
+		<div class="helloTag">
+		  <h4>Hello, {{ user.first_name }}&nbsp;
+		  &nbsp;<a href="{% url 'logoutview' %}" class="btn-primary btn-sm"><b>Logout</b></a>
+		  </h4>
+		</div>
 	     {% endif %}
 	    </div><!-- End navbar input-->
 
