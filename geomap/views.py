@@ -137,5 +137,23 @@ def reset(request):
         post_reset_redirect=reverse('index'))
 
 
+#TODO
+#@login_required
+def ajax_map_zoom(request):
+	bounds = {
+		'southWestLatitude' : request.POST.get('southWestLatitude'),
+		'southWestLongitude' : request.POST.get('southWestLongitude'),
+		'northEastLatitude' :  request.POST.get('northEastLatitude'),
+		'northEastLongitude' : request.POST.get('northEastLongitude'),
+	}
+
+	return HttpResponse(json.dumps({'TODO' : 'CONTINUE_HERE'}))
+
+
+
+
+
+
+
 
 

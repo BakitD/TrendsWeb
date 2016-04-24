@@ -1,7 +1,3 @@
-
-
-
-
 function rand() {
 	return parseFloat((Math.random() * (0.01 + 0.01) - 0.01).toFixed(8));
 }
@@ -12,6 +8,7 @@ function rand() {
 function initialData(map, trends) {
 	var keys = Object.keys(trends);
 	keys.forEach(function(key){
+		var markers = new L.MarkerClusterGroup({showCoverageOnHover: false});
 		if(trends[key].trends.length > 0) {
 			  var phi = 0.0;
 			  var delta = 360.0 / trends[key].trends.length;
@@ -21,12 +18,14 @@ function initialData(map, trends) {
 				var x = radx * Math.cos(phi) + parseFloat(trends[key].coordinates.latitude);
 				var y = rady * Math.sin(phi) + parseFloat(trends[key].coordinates.longitude);
 				phi = phi + delta;
-				var popup = new L.popup({closeOnClick:false})
-					.setLatLng([x, y])
-					.setContent(trend);
-				map.addLayer(popup);
+				var popup = new L.popup({closeOnClick:false}).setContent(trend);
+
+				var marker = L.marker(new L.LatLng(x,y));
+				marker.bindPopup(popup);
+				markers.addLayer(marker);
 			  });
 		};
+		map.addLayer(markers);
  	}); // keys.forEach
 } // initialData
 
@@ -46,24 +45,6 @@ function onMapZoom(map) {
 		default:
 			break;
 	}*/
-	var bounds = map.getBounds()
-	$.ajax({
-		url : '/ajax/map/zoom/',
-		type: 'POST',
-		data: {
-			southWestLatitude: bounds._southWest.lat,
-			southWestLongitude: bounds._southWest.lng,
-			northEastLatitude: bounds._northEast.lat,
-			northEastLongitude: bounds._northEast.lng
-		},
-
-		success : function(json) {
-			console.log(json);
-		}
-
-		
-	});
-
 }
 
 

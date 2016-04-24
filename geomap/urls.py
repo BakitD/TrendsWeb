@@ -17,4 +17,8 @@ urlpatterns = [
 	url(r'^reset/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$',
             views.reset_confirm, name='reset_confirm'),
         url(r'^reset/$', views.reset, name='reset'),
+
+
+	url(r'^ajax/map/zoom/$', views.ajax_map_zoom, name='ajax_map_zoom'),
+
 ]
