@@ -10,7 +10,12 @@ function renderMap(mapId, trends) {
 		attribution: '© <a href="https://www.mapbox.com/map-feedback/'+
 		'">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'});
 
-	var map = L.map(document.getElementById(mapId), { zoomControl: false, closePopupOnClick : false })
+	var map = L.map(document.getElementById(mapId), {
+				zoomControl: false, minZoom:2, maxZoom:14,
+				worldCopyJump: true,
+				closePopupOnClick: false 
+			}
+		)
 		.addLayer(mapboxTiles)
 		.setView([40,2], 3);
 
