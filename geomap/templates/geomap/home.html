@@ -1,17 +1,18 @@
 {% extends 'geomap/base.html' %}
 
-
 {% block headblock %}
+	{% load staticfiles %}
 	{% load leaflet_tags %}
 	{% load geojson_tags %}
 	{% leaflet_js %}
 	{% leaflet_css %}
 
 	<meta charset=utf-8 />
-	<title>GeoMap</title>
 	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 	<script src='https://api.mapbox.com/mapbox.js/v2.4.0/mapbox.js'></script>
 	<link href='https://api.mapbox.com/mapbox.js/v2.4.0/mapbox.css' rel='stylesheet' />
+	<script type="text/javascript" src="{% static 'geomap/js/map.js' %}"></script>
+
 	<style>
 		body { margin:0; padding:0;}
 		#map { position:absolute; top:0; bottom:0; width:100%; }
@@ -25,46 +26,19 @@
 		.leaflet-popup-tip {visibility:hidden;}
 	</style>
 
+
 {% endblock %}
 
 
 {% block content %}
-	{%comment%}
-	<div id='map'></div>
-	<script>
-		function rand() {
-			return parseFloat((Math.random() * (0.02 + 0.02) - 0.02).toFixed(8));
-		}
-		L.mapbox.accessToken = 'pk.eyJ1IjoiYmFraXQiLCJhIjoiY2ltZHMzbWN'+
-			'iMDAyOHdka2toYzdkNTc4ciJ9.5nYeNUZPv2ohnoYWknNIpw';
-		var mapboxTiles = L.tileLayer('https://api.mapbox.com/v4/bakit.dc14b0c3/'+
-			'{z}/{x}/{y}.png?access_token=' + L.mapbox.accessToken, {
-    			attribution: '© <a href="https://www.mapbox.com/map-feedback/'+
-			'">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'});
-		var map = L.map('map', { zoomControl: false, closePopupOnClick : false })
-    			.addLayer(mapboxTiles)
-    			.setView([40,2], 3);
-		new L.Control.Zoom({ position: 'bottomright' }).addTo(map);
-		var trends = {{ trends|safe }};
-		var keys = Object.keys(trends);
-		keys.forEach(function(key){
-			if(trends[key].trends.length > 0) {
-			  var phi = 0.0;
-			  var delta = 360.0 / trends[key].trends.length;
-			  var radx = 0.02;
-			  var rady = 0.04;				
-			  trends[key].trends.forEach(function(trend) {
-				var x = radx * Math.cos(phi) + parseFloat(trends[key].coordinates.latitude);
-				var y = rady * Math.sin(phi) + parseFloat(trends[key].coordinates.longitude);
-				phi = phi + delta;
-				var popup = new L.popup({closeOnClick:false})
-					.setLatLng([x, y])
-					.setContent(trend);
-				
-				map.addLayer(popup);
-			  });
-			};
-		});
+	<div id="map"></div>
+
+	<script type="text/javascript">
+		renderMap('map', {{ trends | safe }});
 	</script>
-	{%endcomment%}
 {% endblock %}
+
+
+
+
+

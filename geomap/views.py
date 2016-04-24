@@ -23,9 +23,11 @@ def anonymous_required(user):
 
 # VIEWS
 def index(request):
+	login_errors = request.session.pop('login_errors', None)
 	#trends = redis.get('geomap')
 	trends = dict(json.loads(redis.get('geomap')).items()[:15])
-	return render(request, 'geomap/home.html', {'trends' : json.dumps(trends)})
+	return render(request, 'geomap/home.html', {'trends' : json.dumps(trends), 'login_errors':login_errors})
+
 
 @login_required
 def logoutview(request):
@@ -35,16 +37,15 @@ def logoutview(request):
 
 @user_passes_test(anonymous_required)
 def loginview(request):
-	login_errors = []
 	if request.method == 'POST':
 		username = request.POST.get('username')
 		password = request.POST.get('password')
 		user = authenticate(username=username, password=password)
 		if not user:
-			login_errors.append('Invalid credentials')
+			request.session['login_errors'] = ['Invalid credentials',]
 		elif user.is_active:
 			login(request, user)
-	return render(request, 'geomap/home.html', {'login_errors' : login_errors})
+	return redirect('index')
 
 
 
