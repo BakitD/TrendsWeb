@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
+from django.conf import settings
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.views import password_reset, password_reset_confirm
@@ -11,10 +12,14 @@ from .forms import RegisterForm, ProfileEditForm, PasswordResetForm
 from django.forms.forms import NON_FIELD_ERRORS
 from models import TrendModel, Place, Trend
 
-
 import json
 from django_redis import get_redis_connection
+
+
 redis = get_redis_connection('default')
+mapConfig = settings.MAP_CONFIG
+
+
 
 
 # SELF-DEFINED FUNCTIONS
@@ -26,7 +31,11 @@ def index(request):
 	login_errors = request.session.pop('login_errors', None)
 	#trends = redis.get('geomap')
 	trends = dict(json.loads(redis.get('geomap')).items()[:15])
-	return render(request, 'geomap/home.html', {'trends' : json.dumps(trends), 'login_errors':login_errors})
+	return render(request, 'geomap/home.html', 
+			{'trends' : json.dumps(trends), 
+			'login_errors':login_errors,
+			'mapConfig' : mapConfig,
+			})
 
 
 @login_required

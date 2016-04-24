@@ -1,12 +1,6 @@
-
-
-
-
 function rand() {
-	return parseFloat((Math.random() * (0.01 + 0.01) - 0.01).toFixed(8));
+	return 0;parseFloat((Math.random() * (0.005 + 0.005) - 0.005).toFixed(8));
 }
-
-
 
 
 function initialData(map, trends) {
@@ -15,8 +9,8 @@ function initialData(map, trends) {
 		if(trends[key].trends.length > 0) {
 			  var phi = 0.0;
 			  var delta = 360.0 / trends[key].trends.length;
-			  var radx = 0.02;
-			  var rady = 0.04;				
+			  var radx = 0.03;
+			  var rady = 0.06;				
 			  trends[key].trends.forEach(function(trend) {
 				var x = radx * Math.cos(phi) + parseFloat(trends[key].coordinates.latitude);
 				var y = rady * Math.sin(phi) + parseFloat(trends[key].coordinates.longitude);
@@ -68,32 +62,28 @@ function onMapZoom(map) {
 
 
 
-function renderMap(mapId, trends) {
+function renderMap(mapId, trends, mapConfig) {
 
 	// Initializing map
-	L.mapbox.accessToken = 'pk.eyJ1IjoiYmFraXQiLCJhIjoiY2ltZHMzbWNiMDAyOHdka2toYzdkNTc4ciJ9.5nYeNUZPv2ohnoYWknNIpw';
-
-	var mapboxTiles = L.tileLayer('https://api.mapbox.com/v4/bakit.dc14b0c3/'+
-		'{z}/{x}/{y}.png?access_token=' + L.mapbox.accessToken, {
-		attribution: '© <a href="https://www.mapbox.com/map-feedback/'+
-		'">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'});
+	L.mapbox.accessToken = mapConfig.accessToken;
+	var mapLayerURL = mapConfig.mapURL + L.mapbox.accessToken
+	var mapboxTiles = L.tileLayer(mapLayerURL, {attribution: mapConfig.attribution });
 
 	var map = L.map(document.getElementById(mapId), {
-				zoomControl: false, minZoom:2, maxZoom:14,
+				minZoom:mapConfig.minZoom, 
+				maxZoom:mapConfig.maxZoom,
+				zoomControl: false, 
 				worldCopyJump: true,
 				closePopupOnClick: false 
 			}
 		)
 		.addLayer(mapboxTiles)
-		.setView([40,2], 3);
+		.setView([mapConfig.initLat, mapConfig.initLng], mapConfig.initZoom);
 
 	new L.Control.Zoom({ position: 'bottomright' }).addTo(map);
-	
-
 
 	// Load initial data
 	initialData(map, trends);
-
 
 	// On map zoon callback function
 	map.on('zoomend', function (e) {
