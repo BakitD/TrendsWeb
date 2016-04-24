@@ -1,21 +1,16 @@
-function rand() {
-	return 0;parseFloat((Math.random() * (0.005 + 0.005) - 0.005).toFixed(8));
-}
-
-
-function initialData(map, trends) {
+function initialDataCircle(map, trends) {
 	var keys = Object.keys(trends);
 	keys.forEach(function(key){
 		if(trends[key].trends.length > 0) {
 			  var phi = 0.0;
 			  var delta = 360.0 / trends[key].trends.length;
-			  var radx = 0.03;
-			  var rady = 0.06;				
+			  var radx = 0.055;
+			  var rady = 0.08;				
 			  trends[key].trends.forEach(function(trend) {
 				var x = radx * Math.cos(phi) + parseFloat(trends[key].coordinates.latitude);
 				var y = rady * Math.sin(phi) + parseFloat(trends[key].coordinates.longitude);
 				phi = phi + delta;
-				var popup = new L.popup({closeOnClick:false})
+				var popup = new L.popup({closeOnClick:false, maxWidth:120, closeButton:false})
 					.setLatLng([x, y])
 					.setContent(trend);
 				map.addLayer(popup);
@@ -23,6 +18,35 @@ function initialData(map, trends) {
 		};
  	}); // keys.forEach
 } // initialData
+
+
+function initialDataSquare(map, trends) {
+	var keys = Object.keys(trends);
+	keys.forEach(function(key){
+		if(trends[key].trends.length > 0) {
+			  var latDelta = 0.08;
+			  var lngDelta = 0.03;
+			  var colums = parseInt(Math.sqrt(trends[key].trends.length));
+			  var i = 0;
+			  var x = parseFloat(trends[key].coordinates.latitude);
+			  var y = parseFloat(trends[key].coordinates.longitude);
+			  trends[key].trends.forEach(function(trend) {
+				if(i > colums) {
+					y += latDelta;
+					x = parseFloat(trends[key].coordinates.latitude);
+					i = 0;
+				};
+				i++;
+				x += lngDelta;
+				var popup = new L.popup({closeOnClick:false, maxWidth:120,closeButton:false})
+					.setLatLng([x, y])
+					.setContent(trend);
+				map.addLayer(popup);
+			  });
+		};
+ 	}); // keys.forEach
+} // initialData
+
 
 
 function onMapZoom(map) {
@@ -83,7 +107,12 @@ function renderMap(mapId, trends, mapConfig) {
 	new L.Control.Zoom({ position: 'bottomright' }).addTo(map);
 
 	// Load initial data
-	initialData(map, trends);
+	if (mapConfig.placing == 'circle') {
+		initialDataCircle(map, trends);
+	}
+	else {
+		initialDataSquare(map, trends);
+	}
 
 	// On map zoon callback function
 	map.on('zoomend', function (e) {
