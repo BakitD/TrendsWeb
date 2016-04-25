@@ -16,8 +16,8 @@ function initialDataCircle(map, trends) {
 				map.addLayer(popup);
 			  });
 		};
- 	}); // keys.forEach
-} // initialData
+ 	});
+}
 
 
 function initialDataSquare(map, trends) {
@@ -31,6 +31,11 @@ function initialDataSquare(map, trends) {
 			  var x = parseFloat(trends[key].coordinates.latitude);
 			  var y = parseFloat(trends[key].coordinates.longitude);
 			  trends[key].trends.forEach(function(trend) {
+				var popup = new L.popup({closeOnClick:false, maxWidth:120,closeButton:false})
+					.setLatLng([x, y])
+					.setContent(trend);
+				map.addLayer(popup);
+				//popup.addTo(map);
 				if(i > colums) {
 					y += latDelta;
 					x = parseFloat(trends[key].coordinates.latitude);
@@ -38,50 +43,51 @@ function initialDataSquare(map, trends) {
 				};
 				i++;
 				x += lngDelta;
-				var popup = new L.popup({closeOnClick:false, maxWidth:120,closeButton:false})
-					.setLatLng([x, y])
-					.setContent(trend);
-				map.addLayer(popup);
 			  });
 		};
- 	}); // keys.forEach
-} // initialData
+ 	});
+}
 
 
-
-function onMapZoom(map) {
-	/*var currentZoom = map.getZoom();
-	switch (currentZoom) {
-		case 4:
-			console.log(currentZoom);
-			break;
-		case 7:
-			console.log(currentZoom);
-			break;
-		case 14:
-			console.log('Stop zooming me!');
-			break;
-		default:
-			break;
-	}*/
+function onZoom_callback(map, zoomValue) {
 	var bounds = map.getBounds()
 	$.ajax({
 		url : '/ajax/map/zoom/',
 		type: 'POST',
 		data: {
-			southWestLatitude: bounds._southWest.lat,
-			southWestLongitude: bounds._southWest.lng,
-			northEastLatitude: bounds._northEast.lat,
-			northEastLongitude: bounds._northEast.lng
+			southWestLatitude: parseFloat(bounds._southWest.lat),
+			southWestLongitude: parseFloat(bounds._southWest.lng),
+			northEastLatitude: parseFloat(bounds._northEast.lat),
+			northEastLongitude: parseFloat(bounds._northEast.lng),
+			zoomValue: zoomValue
 		},
 
 		success : function(json) {
-			console.log(json);
-		}
-
-		
+			var jd = JSON.parse(json);
+			 //&& Object.keys(jd.trends).length > 0
+			if (jd.trends) {
+				initialDataSquare(map, jd.trends);
+			}		
+		}		
 	});
+}
 
+
+
+function onMapZoom(map) {
+	var currentZoom = map.getZoom();
+	switch (currentZoom) {
+		case 6:
+			onZoom_callback(map, currentZoom);
+			console.log(currentZoom);
+			break;
+		case 8:
+			onZoom_callback(map, currentZoom);
+			console.log(currentZoom);
+			break;
+		default:
+			break;
+	}
 }
 
 
@@ -114,9 +120,15 @@ function renderMap(mapId, trends, mapConfig) {
 		initialDataSquare(map, trends);
 	}
 
+
 	// On map zoon callback function
+	var old_zoom_value = map.getZoom();
 	map.on('zoomend', function (e) {
-	    onMapZoom(map);
+		var new_zoom_value = map.getZoom();
+		if (new_zoom_value > old_zoom_value) {
+	    		onMapZoom(map);
+		}
+		old_zoom_value = new_zoom_value;
 	});
 
 } // renderMap function

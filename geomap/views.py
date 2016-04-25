@@ -147,16 +147,24 @@ def reset(request):
 
 
 #TODO
-#@login_required
+@login_required
 def ajax_map_zoom(request):
-	bounds = {
-		'southWestLatitude' : request.POST.get('southWestLatitude'),
-		'southWestLongitude' : request.POST.get('southWestLongitude'),
-		'northEastLatitude' :  request.POST.get('northEastLatitude'),
-		'northEastLongitude' : request.POST.get('northEastLongitude'),
-	}
-
-	return HttpResponse(json.dumps({'TODO' : 'CONTINUE_HERE'}))
+	southWestLatitude = float(request.POST.get('southWestLatitude'))
+	southWestLongitude = float(request.POST.get('southWestLongitude'))
+	northEastLatitude =  float(request.POST.get('northEastLatitude'))
+	northEastLongitude = float(request.POST.get('northEastLongitude'))
+	zoomValue = request.POST.get('zoomValue')
+	trends = {}
+	if int(zoomValue) in (6,8):
+		data = json.loads(redis.get('geomap'))
+		for key, value in data.iteritems():
+			coordinates = value.get('coordinates')
+			longitude = float(coordinates.get('longitude'))
+			latitude = float(coordinates.get('latitude'))
+			if (longitude > southWestLongitude and longitude < northEastLongitude and 
+				latitude > southWestLatitude and latitude < northEastLatitude):
+				trends[key] = data[key]
+	return HttpResponse(json.dumps({'trends' : dict(trends.items()[:8])}))
 
 
 
