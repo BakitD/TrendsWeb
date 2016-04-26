@@ -1,24 +1,21 @@
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
-from django.conf import settings
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.views import password_reset, password_reset_confirm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 
+from django.conf import settings
 from .forms import RegisterForm, ProfileEditForm, PasswordResetForm
-from django.forms.forms import NON_FIELD_ERRORS
-from models import TrendModel, Place, Trend
+from models import Place, Trend
 
 import json
 from django_redis import get_redis_connection
 
-
 redis = get_redis_connection('default')
 mapConfig = settings.MAP_CONFIG
-
 
 
 
@@ -29,12 +26,12 @@ def anonymous_required(user):
 # VIEWS
 def index(request):
 	login_errors = request.session.pop('login_errors', None)
-	#trends = redis.get('geomap')
 	trends = dict(json.loads(redis.get('geomap')).items()[:15])
 	return render(request, 'geomap/home.html', 
 			{'trends' : json.dumps(trends), 
 			'login_errors':login_errors,
 			'mapConfig' : mapConfig,
+			'authUserFlag' : int(request.user.is_authenticated())
 			})
 
 
@@ -109,7 +106,6 @@ def profile_delete(request):
 	return redirect('index')
 
 
-
 @login_required
 def places(request):
 	return render(request, 'geomap/places.html', {'countries' : Place.get_countries()})
@@ -122,12 +118,11 @@ def citytrends(request, country, woeid):
 	if country_data.get('trends'): places.insert(0, country_data)
 	return render(request, 'geomap/citytrends.html', {'placetrends' : places, 'country' : country})
 
+
 @login_required
 def placehistory(request, place, woeid):
 	week_trends = Trend.get_weektrends(woeid)
 	return render(request, 'geomap/placehistory.html', {'place' : place, 'week_trends' : week_trends})
-
-
 
 
 @user_passes_test(anonymous_required)
@@ -146,7 +141,8 @@ def reset(request):
         post_reset_redirect=reverse('index'))
 
 
-#TODO
+
+# View for AJAX on map zooming
 @login_required
 def ajax_map_zoom(request):
 	southWestLatitude = float(request.POST.get('southWestLatitude'))
@@ -165,12 +161,5 @@ def ajax_map_zoom(request):
 				latitude > southWestLatitude and latitude < northEastLatitude):
 				trends[key] = data[key]
 	return HttpResponse(json.dumps({'trends' : dict(trends.items()[:8])}))
-
-
-
-
-
-
-
 
 

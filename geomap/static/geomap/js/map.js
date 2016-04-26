@@ -92,7 +92,7 @@ function onMapZoom(map) {
 
 
 
-function renderMap(mapId, trends, mapConfig) {
+function renderMap(mapId, trends, mapConfig, authUserFlag) {
 
 	// Initializing map
 	L.mapbox.accessToken = mapConfig.accessToken;
@@ -122,14 +122,16 @@ function renderMap(mapId, trends, mapConfig) {
 
 
 	// On map zoon callback function
-	var old_zoom_value = map.getZoom();
-	map.on('zoomend', function (e) {
-		var new_zoom_value = map.getZoom();
-		if (new_zoom_value > old_zoom_value) {
-	    		onMapZoom(map);
-		}
-		old_zoom_value = new_zoom_value;
-	});
+	if (authUserFlag) {
+		var old_zoom_value = map.getZoom();
+		map.on('zoomend', function (e) {
+			var new_zoom_value = map.getZoom();
+			if (new_zoom_value > old_zoom_value) {
+		    		onMapZoom(map);
+			}
+			old_zoom_value = new_zoom_value;
+		});
+	}
 
 } // renderMap function
 
