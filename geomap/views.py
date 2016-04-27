@@ -17,16 +17,27 @@ from django_redis import get_redis_connection
 redis = get_redis_connection('default')
 mapConfig = settings.MAP_CONFIG
 
+from .settings import CACHE_LAYER_NAME, REDIS_LOCATION_KEY_NAME
+from django.core.cache import cache
+import signals
+
 
 
 # SELF-DEFINED FUNCTIONS
 def anonymous_required(user):
 	return user.is_anonymous()
 
-# VIEWS
+
+# VIEWS TODO continue here
 def index(request):
+	print 'view >>>>>', cache.get(CACHE_LAYER_NAME)
 	login_errors = request.session.pop('login_errors', None)
-	trends = dict(json.loads(redis.get('geomap')).items()[:15])
+	#trends = dict(json.loads(redis.get('geomap')).items()[:15])
+	trends_js = json.loads(redis.get(REDIS_LOCATION_KEY_NAME))
+	trends = {}
+	for key in trends_js.keys():
+		if key in cache.get(CACHE_LAYER_NAME)[0]:
+			trends[key] = trends_js[key]
 	return render(request, 'geomap/home.html', 
 			{'trends' : json.dumps(trends), 
 			'login_errors':login_errors,

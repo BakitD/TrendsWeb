@@ -10,8 +10,8 @@ from django.db import models
 from operator import itemgetter
 
 from datetime import datetime, timedelta
-
 from .settings import DATETIME_FORMAT, TREND_STORE_DAYS, TREND_UPDATE_FREQ, DATE_FORMAT, USER_DATE_FORMAT
+
 
 class GeoTrend(models.Model):
 	dtime = models.DateTimeField()
@@ -92,7 +92,7 @@ class Place(models.Model):
 					'volume' : geotrend.volume})
 		return {'place' : country.name, 'place_tag' : country.woeid, 'woeid' : country.woeid,
 				'trends' : sorted(trends, key=country.sort_place, reverse=True)}
-			
+
 	def sort_place(self, element):
 		value = element.get('volume') or 0
 		return int(value)
@@ -139,4 +139,5 @@ class Trend(models.Model):
 			end_date = end_date - timedelta(days=1)
 			days_counter += 1
 		return week_trends
+
 
