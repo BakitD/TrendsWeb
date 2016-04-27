@@ -10,17 +10,10 @@ from django.contrib.auth import authenticate, login, logout, update_session_auth
 from django.conf import settings
 from .forms import RegisterForm, ProfileEditForm, PasswordResetForm
 from models import Place, Trend
-
+from trendstore import tStore
 import json
-from django_redis import get_redis_connection
 
-redis = get_redis_connection('default')
 mapConfig = settings.MAP_CONFIG
-
-from .settings import CACHE_LAYER_NAME, REDIS_LOCATION_KEY_NAME
-from django.core.cache import cache
-import signals
-
 
 
 # SELF-DEFINED FUNCTIONS
@@ -28,16 +21,10 @@ def anonymous_required(user):
 	return user.is_anonymous()
 
 
-# VIEWS TODO continue here
+# VIEWS TODO
 def index(request):
-	print 'view >>>>>', cache.get(CACHE_LAYER_NAME)
 	login_errors = request.session.pop('login_errors', None)
-	#trends = dict(json.loads(redis.get('geomap')).items()[:15])
-	trends_js = json.loads(redis.get(REDIS_LOCATION_KEY_NAME))
-	trends = {}
-	for key in trends_js.keys():
-		if key in cache.get(CACHE_LAYER_NAME)[0]:
-			trends[key] = trends_js[key]
+	trends = tStore.get_trends_by_layer(0)
 	return render(request, 'geomap/home.html', 
 			{'trends' : json.dumps(trends), 
 			'login_errors':login_errors,
@@ -156,21 +143,13 @@ def reset(request):
 # View for AJAX on map zooming
 @login_required
 def ajax_map_zoom(request):
-	southWestLatitude = float(request.POST.get('southWestLatitude'))
-	southWestLongitude = float(request.POST.get('southWestLongitude'))
-	northEastLatitude =  float(request.POST.get('northEastLatitude'))
-	northEastLongitude = float(request.POST.get('northEastLongitude'))
-	zoomValue = request.POST.get('zoomValue')
-	trends = {}
-	if int(zoomValue) in (6,8):
-		data = json.loads(redis.get('geomap'))
-		for key, value in data.iteritems():
-			coordinates = value.get('coordinates')
-			longitude = float(coordinates.get('longitude'))
-			latitude = float(coordinates.get('latitude'))
-			if (longitude > southWestLongitude and longitude < northEastLongitude and 
-				latitude > southWestLatitude and latitude < northEastLatitude):
-				trends[key] = data[key]
-	return HttpResponse(json.dumps({'trends' : dict(trends.items()[:8])}))
+	swLat = float(request.POST.get('southWestLatitude'))
+	swLng = float(request.POST.get('southWestLongitude'))
+	neLat =  float(request.POST.get('northEastLatitude'))
+	neLng = float(request.POST.get('northEastLongitude'))
+	scale = int(request.POST.get('zoomValue'))
+	trends = tStore.get_places(scale, swLat, swLng, neLat, neLng)
+	return HttpResponse(json.dumps({'trends' : trends}))
+
 
 
