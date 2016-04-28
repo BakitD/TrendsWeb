@@ -73,25 +73,6 @@ function onZoom_callback(map, zoomValue) {
 }
 
 
-
-function onMapZoom(map) {
-	var currentZoom = map.getZoom();
-	switch (currentZoom) {
-		case 6:
-			onZoom_callback(map, currentZoom);
-			console.log(currentZoom);
-			break;
-		case 8:
-			onZoom_callback(map, currentZoom);
-			console.log(currentZoom);
-			break;
-		default:
-			break;
-	}
-}
-
-
-
 function renderMap(mapId, trends, mapConfig, authUserFlag) {
 
 	// Initializing map
@@ -120,16 +101,18 @@ function renderMap(mapId, trends, mapConfig, authUserFlag) {
 		initialDataSquare(map, trends);
 	}
 
-
 	// On map zoon callback function
 	if (authUserFlag) {
-		var old_zoom_value = map.getZoom();
+		//var old_zoom_value = map.getZoom();
 		map.on('zoomend', function (e) {
-			var new_zoom_value = map.getZoom();
-			if (new_zoom_value > old_zoom_value) {
-		    		onMapZoom(map);
+			//var new_zoom_value = map.getZoom();
+			//if (new_zoom_value > old_zoom_value) {
+			scale = map.getZoom();
+			if (mapConfig.scales.indexOf(scale) >= 0) {
+				onZoom_callback(map, scale);
+				console.log(scale);
 			}
-			old_zoom_value = new_zoom_value;
+			//old_zoom_value = new_zoom_value;
 		});
 	}
 

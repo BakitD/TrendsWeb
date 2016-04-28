@@ -56,7 +56,7 @@ class TrendStore:
 
 	def get_scales(self):
 		scales = cache.get(CACHE_LAYER_NAME) or {}
-		return scales.keys()
+		return [int(x) for x in scales.keys()]
 
 
 
