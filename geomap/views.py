@@ -14,6 +14,8 @@ from trendstore import tStore
 import json
 
 mapConfig = settings.MAP_CONFIG
+mapConfig['scales'] = tStore.get_scales()
+
 
 
 # SELF-DEFINED FUNCTIONS

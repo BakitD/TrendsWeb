@@ -34,12 +34,14 @@ class TrendStore:
 		self.update_trends()
 		woeids = cache.get(CACHE_LAYER_NAME) or ()
 		if woeids: woeids = woeids.get(scale)
+		#if not self.trends: self.update_trends()
 		return {key : self.trends[key] for key in self.trends.keys() if key in woeids}		
 
 	def get_places(self, scale, swLat, swLng, neLat, neLng):
 		woeids = cache.get(CACHE_LAYER_NAME) or ()
 		if woeids: woeids = woeids.get(scale) or ()
 		trends = {}
+		#if not self.trends: self.update_trends()
 		for woeid in woeids:
 			try:
 				value = self.trends.get(woeid)
@@ -49,10 +51,12 @@ class TrendStore:
 				if (longitude > swLng and longitude < neLng and 
 					latitude > swLat and latitude < neLat):
 					trends[woeid] = self.trends[woeid]
-			except Exception as exc:
-				print exc.message
+			except Exception: pass
 		return trends
 
+	def get_scales(self):
+		scales = cache.get(CACHE_LAYER_NAME) or {}
+		return scales.keys()
 
 
 
