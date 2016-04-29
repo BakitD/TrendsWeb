@@ -23,16 +23,12 @@ def anonymous_required(user):
 	return user.is_anonymous()
 
 
-# VIEWS TODO
 def index(request):
-	login_errors = request.session.pop('login_errors', None)
-	trends = tStore.get_trends_by_layer(0)
-	return render(request, 'geomap/home.html', 
-			{'trends' : json.dumps(trends), 
-			'login_errors':login_errors,
+	return render(request, 'geomap/home.html', {
+			'login_errors': request.session.pop('login_errors', None),
 			'mapConfig' : mapConfig,
 			'authUserFlag' : int(request.user.is_authenticated())
-			})
+		})
 
 
 @login_required

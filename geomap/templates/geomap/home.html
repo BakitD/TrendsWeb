@@ -37,10 +37,8 @@
 	<div id="map"></div>
 	<script type="text/javascript">
 		var mapConfigJS = {{ mapConfig | safe }};
-		var trendsJS = {{ trends | safe }};
 		var authUserFlagJS = {{ authUserFlag | safe }};
-		//var mapDrawwer = new MapDrawer('map', mapConfigJS, authUserFlagJS);
-		renderMap('map', trendsJS, mapConfigJS, authUserFlagJS);
+		renderMap('map', mapConfigJS, authUserFlagJS);
 	</script>
 {% endblock %}
 

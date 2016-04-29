@@ -41,7 +41,7 @@ class TrendStore:
 		woeids = cache.get(CACHE_LAYER_NAME) or ()
 		if woeids: woeids = woeids.get(scale) or ()
 		trends = {}
-		#if not self.trends: self.update_trends()
+		if not self.trends: self.update_trends()
 		for woeid in woeids:
 			try:
 				value = self.trends.get(woeid)

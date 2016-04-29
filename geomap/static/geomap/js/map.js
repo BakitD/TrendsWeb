@@ -1,11 +1,3 @@
-woeids = [];
-
-function addWoeid(woeid) {
-	if (woeids.indexOf(woeid) < 0) {
-		woeids.push(woeid);
-	}
-}
-
 // Function creates popups array with coordinates
 // that makes popups located around central point.
 function initialDataCircle(trends) {
@@ -25,7 +17,6 @@ function initialDataCircle(trends) {
 					.setLatLng([x, y])
 					.setContent(trend);
 				result.push(popup);
-				addWoeid(key);
 			  });
 		};
  	});
@@ -50,7 +41,6 @@ function initialDataSquare(trends) {
 					.setLatLng([x, y])
 					.setContent(trend);
 				result.push(popup);
-				addWoeid(key);
 				if(i > colums) {
 					y += latDelta;
 					x = parseFloat(trends[key].coordinates.latitude);
@@ -64,21 +54,28 @@ function initialDataSquare(trends) {
 	return result;
 }
 
+// TODO Continue gere Layers
+// use clearLayers();
+layers = {};
 
-function drawOnMap(map, items) {
-	items.forEach(function(item) {
-		item.addTo(map);
-	});
-	console.log(woeids);
-	//L.layerGroup(items).addTo(map);
+function drawOnMap(map, items, scale) {
+	if (layers[scale] != undefined) {
+		layers[scale].addLayer(L.layerGroup(items));
+	}
+	else {
+		layers[scale] = L.layerGroup(items);
+	}
+	layers[scale].addTo(map);
 }
 
 
-// Callback function on map zooming.
-// Requests places for coordinates that is inside
-// bounds. Return list of popups.
-function onZoom_callback(map, url, drawFunction) {
+// Callback function on zoomend and dragend.
+// Requests places for coordinates that's inside the bounds.
+function onMapAction(map, url, drawFunction, scale) {
 	var bounds = map.getBounds()
+	if (scale == undefined) {
+		scale = map.getZoom();
+	}
 	$.ajax({
 		url : url,
 		type: 'POST',
@@ -87,21 +84,20 @@ function onZoom_callback(map, url, drawFunction) {
 			southWestLongitude: parseFloat(bounds._southWest.lng),
 			northEastLatitude: parseFloat(bounds._northEast.lat),
 			northEastLongitude: parseFloat(bounds._northEast.lng),
-			scale: map.getZoom()
+			scale: scale
 		},
 
 		success : function(json) {
 			var jd = JSON.parse(json);
 			if (jd.trends) {
-				popups = drawFunction(jd.trends);
-				drawOnMap(map, popups);
-			}		
+				drawOnMap(map, drawFunction(jd.trends), scale);
+			}
 		}
 	});
 }
 
 // Initialization function.
-function renderMap(mapId, trends, mapConfig, authUserFlag) {
+function renderMap(mapId, mapConfig, authUserFlag) {
 
 	// Initializing map
 	L.mapbox.accessToken = mapConfig.accessToken;
@@ -122,38 +118,27 @@ function renderMap(mapId, trends, mapConfig, authUserFlag) {
 	new L.Control.Zoom({ position: 'bottomright' }).addTo(map);
 
 	// Set drawing function
-	drawFunction = initialDataSquare;
-	if (mapConfig.placing == 'circle') {
-		drawFunction = initialDataCircle;
-	}
+	drawFunction = (mapConfig.placing == 'square') ? initialDataSquare : initialDataCircle;
 
-	// Defining layer groups dictionary
-	var layers = {};
 
-	// Load initial data if initScaleIndex exists
-	if ('initScaleIndex' in mapConfig) {
-		layers[mapConfig.initScaleIndex] = drawFunction(trends);
-		drawOnMap(map, layers[mapConfig.initScaleIndex]);
-	}
+	// Call function for initial trends
+	onMapAction(map, mapConfig.ajaxOnZoomUrl, drawFunction, mapConfig.initScaleIndex);
+
 
 	// On map zoon callback function
 	if (authUserFlag) {
 		map.on('zoomend', function (e) {
-			scale = map.getZoom();
-			if (mapConfig.scales.indexOf(scale) >= 0) {
-				console.log(scale);
-				onZoom_callback(map, mapConfig.ajaxOnZoomUrl, drawFunction);
+			if (mapConfig.scales.indexOf(map.getZoom()) >= 0) {
+				onMapAction(map, mapConfig.ajaxOnZoomUrl, drawFunction);
 			}
 		});
 		map.on('dragend', function (e) {
-			scale = map.getZoom();
-			if (mapConfig.scales.indexOf(scale) >= 0) {
-				onZoom_callback(map, mapConfig.ajaxOnZoomUrl, drawFunction);
+			if (mapConfig.scales.indexOf(map.getZoom()) >= 0) {
+				onMapAction(map, mapConfig.ajaxOnZoomUrl, drawFunction);
 			}
 		});
 	}
 
 }
-
 
 
