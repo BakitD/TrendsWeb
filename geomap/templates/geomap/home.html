@@ -38,8 +38,9 @@
 	<script type="text/javascript">
 		var mapConfigJS = {{ mapConfig | safe }};
 		var trendsJS = {{ trends | safe }};
-		var authUserFlag = {{ authUserFlag | safe }};
-		renderMap('map', trendsJS, mapConfigJS, authUserFlag);
+		var authUserFlagJS = {{ authUserFlag | safe }};
+		//var mapDrawwer = new MapDrawer('map', mapConfigJS, authUserFlagJS);
+		renderMap('map', trendsJS, mapConfigJS, authUserFlagJS);
 	</script>
 {% endblock %}
 

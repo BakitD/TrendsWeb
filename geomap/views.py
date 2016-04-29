@@ -27,7 +27,6 @@ def anonymous_required(user):
 def index(request):
 	login_errors = request.session.pop('login_errors', None)
 	trends = tStore.get_trends_by_layer(0)
-	print trends
 	return render(request, 'geomap/home.html', 
 			{'trends' : json.dumps(trends), 
 			'login_errors':login_errors,
@@ -150,7 +149,7 @@ def ajax_map_zoom(request):
 	swLng = float(request.POST.get('southWestLongitude'))
 	neLat =  float(request.POST.get('northEastLatitude'))
 	neLng = float(request.POST.get('northEastLongitude'))
-	scale = int(request.POST.get('zoomValue'))
+	scale = int(request.POST.get('scale'))
 	trends = tStore.get_places(scale, swLat, swLng, neLat, neLng)
 	return HttpResponse(json.dumps({'trends' : trends}))
 

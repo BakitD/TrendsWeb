@@ -1,4 +1,15 @@
-function initialDataCircle(map, trends) {
+woeids = [];
+
+function addWoeid(woeid) {
+	if (woeids.indexOf(woeid) < 0) {
+		woeids.push(woeid);
+	}
+}
+
+// Function creates popups array with coordinates
+// that makes popups located around central point.
+function initialDataCircle(trends) {
+	var result = [];
 	var keys = Object.keys(trends);
 	keys.forEach(function(key){
 		if(trends[key].trends.length > 0) {
@@ -13,14 +24,18 @@ function initialDataCircle(map, trends) {
 				var popup = new L.popup({closeOnClick:false, maxWidth:120, closeButton:false})
 					.setLatLng([x, y])
 					.setContent(trend);
-				map.addLayer(popup);
+				result.push(popup);
+				addWoeid(key);
 			  });
 		};
  	});
+	return result;
 }
 
-
-function initialDataSquare(map, trends) {
+// Function creates popups array with coordinates
+// that makes popups located as table.
+function initialDataSquare(trends) {
+	var result = [];
 	var keys = Object.keys(trends);
 	keys.forEach(function(key){
 		if(trends[key].trends.length > 0) {
@@ -34,8 +49,8 @@ function initialDataSquare(map, trends) {
 				var popup = new L.popup({closeOnClick:false, maxWidth:120,closeButton:false})
 					.setLatLng([x, y])
 					.setContent(trend);
-				map.addLayer(popup);
-				//popup.addTo(map);
+				result.push(popup);
+				addWoeid(key);
 				if(i > colums) {
 					y += latDelta;
 					x = parseFloat(trends[key].coordinates.latitude);
@@ -46,33 +61,46 @@ function initialDataSquare(map, trends) {
 			  });
 		};
  	});
+	return result;
 }
 
 
-function onZoom_callback(map, zoomValue) {
+function drawOnMap(map, items) {
+	items.forEach(function(item) {
+		item.addTo(map);
+	});
+	console.log(woeids);
+	//L.layerGroup(items).addTo(map);
+}
+
+
+// Callback function on map zooming.
+// Requests places for coordinates that is inside
+// bounds. Return list of popups.
+function onZoom_callback(map, url, drawFunction) {
 	var bounds = map.getBounds()
 	$.ajax({
-		url : '/ajax/map/zoom/',
+		url : url,
 		type: 'POST',
 		data: {
 			southWestLatitude: parseFloat(bounds._southWest.lat),
 			southWestLongitude: parseFloat(bounds._southWest.lng),
 			northEastLatitude: parseFloat(bounds._northEast.lat),
 			northEastLongitude: parseFloat(bounds._northEast.lng),
-			zoomValue: zoomValue
+			scale: map.getZoom()
 		},
 
 		success : function(json) {
 			var jd = JSON.parse(json);
-			 //&& Object.keys(jd.trends).length > 0
 			if (jd.trends) {
-				initialDataSquare(map, jd.trends);
+				popups = drawFunction(jd.trends);
+				drawOnMap(map, popups);
 			}		
-		}		
+		}
 	});
 }
 
-
+// Initialization function.
 function renderMap(mapId, trends, mapConfig, authUserFlag) {
 
 	// Initializing map
@@ -93,31 +121,39 @@ function renderMap(mapId, trends, mapConfig, authUserFlag) {
 
 	new L.Control.Zoom({ position: 'bottomright' }).addTo(map);
 
-	// Load initial data
+	// Set drawing function
+	drawFunction = initialDataSquare;
 	if (mapConfig.placing == 'circle') {
-		initialDataCircle(map, trends);
+		drawFunction = initialDataCircle;
 	}
-	else {
-		initialDataSquare(map, trends);
+
+	// Defining layer groups dictionary
+	var layers = {};
+
+	// Load initial data if initScaleIndex exists
+	if ('initScaleIndex' in mapConfig) {
+		layers[mapConfig.initScaleIndex] = drawFunction(trends);
+		drawOnMap(map, layers[mapConfig.initScaleIndex]);
 	}
 
 	// On map zoon callback function
 	if (authUserFlag) {
-		//var old_zoom_value = map.getZoom();
 		map.on('zoomend', function (e) {
-			//var new_zoom_value = map.getZoom();
-			//if (new_zoom_value > old_zoom_value) {
 			scale = map.getZoom();
 			if (mapConfig.scales.indexOf(scale) >= 0) {
-				onZoom_callback(map, scale);
 				console.log(scale);
+				onZoom_callback(map, mapConfig.ajaxOnZoomUrl, drawFunction);
 			}
-			//old_zoom_value = new_zoom_value;
+		});
+		map.on('dragend', function (e) {
+			scale = map.getZoom();
+			if (mapConfig.scales.indexOf(scale) >= 0) {
+				onZoom_callback(map, mapConfig.ajaxOnZoomUrl, drawFunction);
+			}
 		});
 	}
 
-} // renderMap function
-
+}
 
 
 
