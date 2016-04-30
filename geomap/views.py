@@ -24,10 +24,15 @@ def anonymous_required(user):
 
 
 def index(request):
+	#TODO add trends for non authenticated users
+	if not request.user.is_authenticated():
+		trends = tStore.get_trends_by_layer(mapConfig.get('initScaleIndex'));
+	else: trends = {}
 	return render(request, 'geomap/home.html', {
 			'login_errors': request.session.pop('login_errors', None),
 			'mapConfig' : mapConfig,
-			'authUserFlag' : int(request.user.is_authenticated())
+			'authUserFlag' : int(request.user.is_authenticated()),
+			'trends' : json.dumps(trends)
 		})
 
 

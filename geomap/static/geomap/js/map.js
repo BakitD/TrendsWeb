@@ -54,8 +54,7 @@ function initialDataSquare(trends) {
 	return result;
 }
 
-// TODO Continue gere Layers
-// use clearLayers();
+
 layers = {};
 
 function drawOnMap(map, items, scale) {
@@ -118,7 +117,7 @@ function onZoomDrag(mapConfig, map, lastZoom, drawFunction) {
 }
 
 // Initialization function.
-function renderMap(mapId, mapConfig, authUserFlag) {
+function renderMap(mapId, mapConfig, authUserFlag, trends) {
 
 	// Initializing map
 	L.mapbox.accessToken = mapConfig.accessToken;
@@ -143,18 +142,22 @@ function renderMap(mapId, mapConfig, authUserFlag) {
 
 
 	// Call function for initial trends
-	onMapAction(map, mapConfig.ajaxOnZoomUrl, drawFunction, mapConfig.initScaleIndex);
 
 
 	// On map zoon callback function
 	var lastZoom = 0;
 	if (authUserFlag) {
+		onMapAction(map, mapConfig.ajaxOnZoomUrl, drawFunction, mapConfig.initScaleIndex);
 		map.on('zoomend', function (e) {
 			lastZoom = onZoomDrag(mapConfig, map, lastZoom, drawFunction);
 		});
 		map.on('dragend', function (e) {
 			lastZoom = onZoomDrag(mapConfig, map, lastZoom, drawFunction);
 		});
+	}
+	else {
+		items = drawFunction(trends);
+		drawOnMap(map, items, mapConfig.initScaleIndex);
 	}
 }
 
