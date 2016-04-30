@@ -13,6 +13,7 @@ urlpatterns = [
 	url(r'^places/$', views.places, name='places'),
 	url(r'^places/(?P<country>.+?)/(?P<woeid>\d+)/$', views.citytrends, name='citytrends'),
 	url(r'^places/(?P<place>.+?)/(?P<woeid>\d+)/history/$', views.placehistory, name='placehistory'),
+	url(r'^places/worldwide/$', views.worldwide_trends, name='worldwide_trends'),
 
 	url(r'^reset/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$',
             views.reset_confirm, name='reset_confirm'),

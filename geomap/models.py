@@ -92,6 +92,21 @@ class Place(models.Model):
 					'volume' : geotrend.volume})
 		return {'place' : country.name, 'place_tag' : country.woeid, 'woeid' : country.woeid,
 				'trends' : sorted(trends, key=country.sort_place, reverse=True)}
+	@staticmethod
+	def get_worldwide():
+		trends = []
+		placetype = Placetype.objects.filter(name='worldwide').first()
+		if placetype:
+			worldwide = Place.objects.filter(placetype_id=placetype.id).first()
+			if worldwide:
+				geotrends = GeoTrend.objects.filter(place_id=worldwide.id,
+					dtime__range=[worldwide.dtime.date(), worldwide.dtime])
+			for geotrend in geotrends:
+				trends.append({'name': Trend.objects.filter(id=geotrend.trend_id).first().name,
+						'volume' : geotrend.volume})
+		return {'place' : worldwide.name, 'place_tag' : worldwide.woeid, 'woeid' : worldwide.woeid,
+				'trends' : sorted(trends, key=worldwide.sort_place, reverse=True)}
+
 
 	def sort_place(self, element):
 		value = element.get('volume') or 0

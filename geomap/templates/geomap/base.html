@@ -119,8 +119,14 @@
 		  {% if user.is_authenticated %}
 		    <li>
 		      <a href="{% url 'places' %}">
-				<span class="glyphicon glyphicon-globe" style="color:#2eb8b8"></span>
+				<span class="glyphicon glyphicon-screenshot" style="color:#2eb8b8"></span>
 				<font color=#e5e5ff><b>Locations</b></font>
+		      </a>
+		    </li>
+		    <li>
+		      <a href="{% url 'worldwide_trends' %}">
+				<span class="glyphicon glyphicon-globe" style="color:#2eb8b8"></span>
+				<font color=#e5e5ff><b>Worldwide</b></font>
 		      </a>
 		    </li>
 		  {% endif %}

@@ -121,6 +121,11 @@ def citytrends(request, country, woeid):
 
 
 @login_required
+def worldwide_trends(request):
+	return render(request, 'geomap/worldwide_trends.html', {'trends' : Place.get_worldwide()})
+
+
+@login_required
 def placehistory(request, place, woeid):
 	week_trends = Trend.get_weektrends(woeid)
 	return render(request, 'geomap/placehistory.html', {'place' : place, 'week_trends' : week_trends})
