@@ -4,6 +4,7 @@ from .import views
 
 urlpatterns = [
 	url(r'^$', views.index, name='index'),
+	url(r'^about/$', views.about, name='about'),
 	url(r'^register/$', views.register, name='register'),
 	url(r'^login/$', views.loginview, name='loginview'),
 	url(r'^logout/$', views.logoutview, name='logoutview'),

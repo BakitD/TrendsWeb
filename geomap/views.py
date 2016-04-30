@@ -35,6 +35,9 @@ def index(request):
 			'trends' : json.dumps(trends)
 		})
 
+def about(request):
+	return render(request, 'geomap/about.html')
+
 
 @login_required
 def logoutview(request):
