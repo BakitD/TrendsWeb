@@ -68,6 +68,15 @@ function drawOnMap(map, items, scale) {
 	layers[scale].addTo(map);
 }
 
+function clearMap(scale) {
+	var keys = Object.keys(layers);
+	keys.forEach(function(key) {
+		if(key > scale && layers[key]) {
+			layers[key].clearLayers();
+		} 
+	});
+}
+
 
 // Callback function on zoomend and dragend.
 // Requests places for coordinates that's inside the bounds.
@@ -94,6 +103,18 @@ function onMapAction(map, url, drawFunction, scale) {
 			}
 		}
 	});
+}
+
+// Function is called on zoomend and dragend
+function onZoomDrag(mapConfig, map, lastZoom, drawFunction) {
+	var scale = map.getZoom();
+	if (scale < lastZoom) {
+		clearMap(scale);
+	}
+	if (mapConfig.scales.indexOf(scale) >= 0) {
+		onMapAction(map, mapConfig.ajaxOnZoomUrl, drawFunction);
+	}
+	return scale;
 }
 
 // Initialization function.
@@ -126,19 +147,14 @@ function renderMap(mapId, mapConfig, authUserFlag) {
 
 
 	// On map zoon callback function
+	var lastZoom = 0;
 	if (authUserFlag) {
 		map.on('zoomend', function (e) {
-			if (mapConfig.scales.indexOf(map.getZoom()) >= 0) {
-				onMapAction(map, mapConfig.ajaxOnZoomUrl, drawFunction);
-			}
+			lastZoom = onZoomDrag(mapConfig, map, lastZoom, drawFunction);
 		});
 		map.on('dragend', function (e) {
-			if (mapConfig.scales.indexOf(map.getZoom()) >= 0) {
-				onMapAction(map, mapConfig.ajaxOnZoomUrl, drawFunction);
-			}
+			lastZoom = onZoomDrag(mapConfig, map, lastZoom, drawFunction);
 		});
 	}
-
 }
-
 
