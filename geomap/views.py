@@ -9,6 +9,7 @@ from django.contrib.auth import authenticate, login, logout, update_session_auth
 
 from django.conf import settings
 from .forms import RegisterForm, ProfileEditForm, PasswordResetForm
+from .forms import PaymentDummyForm
 from models import Place, Trend
 from trendstore import tStore
 import json
@@ -73,7 +74,8 @@ def register(request):
 			return redirect('index')
 	else:
 		form = RegisterForm()
-	return render(request, 'geomap/register.html', {'reg_form' : form})
+		pform = PaymentDummyForm()
+	return render(request, 'geomap/register.html', {'reg_form' : form, 'pform' : pform})
 
 
 @login_required

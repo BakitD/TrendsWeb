@@ -112,7 +112,7 @@
 	    <div class="collapse navbar-collapse" id = "dropdown">
 		{% if user.is_authenticated %}
 			<ul class = "nav navbar-nav navbar-left" role = "navigation">
-			 <li><a href="{% url 'profile' %}"><font color=darkorange><b>Profile</b></font></a></li>
+			 <li><a href="{% url 'profile' %}"><font color=darkorange><b>Профиль</b></font></a></li>
 			</ul>
 		{% endif %}
 		<ul class = "nav navbar-nav navbar-left" role = "navigation">
@@ -120,17 +120,17 @@
 		    <li>
 		      <a href="{% url 'places' %}">
 				<span class="glyphicon glyphicon-screenshot" style="color:#2eb8b8"></span>
-				<font color=#e5e5ff><b>Locations</b></font>
+				<font color=#e5e5ff><b>Места</b></font>
 		      </a>
 		    </li>
 		    <li>
 		      <a href="{% url 'worldwide_trends' %}">
 				<span class="glyphicon glyphicon-globe" style="color:#2eb8b8"></span>
-				<font color=#e5e5ff><b>Worldwide</b></font>
+				<font color=#e5e5ff><b>Общемировой</b></font>
 		      </a>
 		    </li>
 		  {% endif %}
-		  <li><a href="{% url 'about' %}"><font color=#e5e5ff><b>About</b></font></a></li>
+		  <li><a href="{% url 'about' %}"><font color=#e5e5ff><b>О проекте</b></font></a></li>
 		</ul>
 	    </div><!-- End Nav Contents -->
 

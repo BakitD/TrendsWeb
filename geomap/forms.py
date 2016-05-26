@@ -1,6 +1,19 @@
 from django import forms
 from django.contrib.auth.models import User
 
+
+class PaymentDummyForm(forms.Form):
+	name = forms.CharField(label='Name', max_length=128, \
+				widget=forms.TextInput(attrs={'required':True}))
+	number = forms.CharField(label='Card number', max_length=16, \
+				widget=forms.TextInput(attrs={'required':True}))
+	month = forms.ChoiceField(label='month', choices=[(x, x) for x in range(1,13)])
+	years = forms.ChoiceField(label='year', choices=[(x, x) for x in range(2017,2026)])
+	code = forms.IntegerField(label='CVC\CVV code', \
+			widget=forms.PasswordInput(attrs={'required':True}), )
+
+
+
 class RegisterForm(forms.Form):
 	name = forms.CharField(label='Name', max_length=64, \
 				widget=forms.TextInput(attrs={'required':True}))
