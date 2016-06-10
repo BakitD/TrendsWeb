@@ -10,6 +10,8 @@ urlpatterns = [
 	url(r'^logout/$', views.logoutview, name='logoutview'),
 	url(r'^profile/$', views.profile, name='profile'),
 	url(r'^profile/delete/$', views.profile_delete, name='profile_delete'),
+	url(r'^trends/search/$', views.search, name='search'),
+	url(r'^trends/info/(?P<trendid>.+?)/(?P<trendname>.+?)/$', views.trendinfo, name='trendinfo'),
 
 	url(r'^places/$', views.places, name='places'),
 	url(r'^places/(?P<country>.+?)/(?P<woeid>\d+)/$', views.citytrends, name='citytrends'),

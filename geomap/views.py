@@ -1,3 +1,4 @@
+#coding: utf-8
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
@@ -10,7 +11,7 @@ from django.contrib.auth import authenticate, login, logout, update_session_auth
 from django.conf import settings
 from .forms import RegisterForm, ProfileEditForm, PasswordResetForm
 from .forms import PaymentDummyForm
-from models import Place, Trend
+from models import Place, Trend, Clusters
 from trendstore import tStore
 import json
 
@@ -53,7 +54,7 @@ def loginview(request):
 		password = request.POST.get('password')
 		user = authenticate(username=username, password=password)
 		if not user:
-			request.session['login_errors'] = ['Invalid credentials',]
+			request.session['login_errors'] = ['Неверные данные',]
 		elif user.is_active:
 			login(request, user)
 	return redirect('index')
@@ -113,7 +114,34 @@ def profile_delete(request):
 
 
 @login_required
+def search(request):
+	trends = []
+	value = ''
+	post = False
+	if request.method == 'POST':
+		value = request.POST.get('value')
+		if value: trends = Trend.search_trends(value)
+		post = True
+	return render(request, 'geomap/search.html', {'trends' : trends, 'value' : value, 'post':post})
+
+
+@login_required
+def trendinfo(request, trendid, trendname):
+	places = Place.get_trend_places(trendid)
+	clusters = Clusters.get_trend_clusters(trendid)
+	tendency, flag = Trend.get_tendency(trendid)
+	print tendency
+	return render(request, 'geomap/trendinfo.html', {'trendname':trendname, \
+					'tendency' : json.dumps(tendency), 'flag':flag, \
+					'clusters' : clusters, 'places':places})
+
+
+
+@login_required
 def places(request):
+	'''import goslate
+	gs = goslate.Goslate()
+	for place in Place.get_countries(): print gs.translate(place['name'], 'ru')'''
 	return render(request, 'geomap/places.html', {'countries' : Place.get_countries()})
 
 

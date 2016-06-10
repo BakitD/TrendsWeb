@@ -23,13 +23,16 @@
 {% block content %}
  <div class="panel">
     <div class="panel-heading countryHead">
-	<h1>Worldwide trends</h1>
+	<h1>Мировые тренды</h1>
+	<h5>Наиболее популярные темы за последние сутки</h5>
     </div>
     <div class="panel-body">
 	<ul class="list-group">
 	     {% for trend in trends.trends %}
 	          <li class="list-group-item list-group-item-success" align="center">
+		    <a href="{% url 'trendinfo' trendid=trend.id trendname=trend.name %}">
 	              <strong>{{ trend.name }}</strong>
+		    </a>
 	          </li>
 	      {% endfor %}
 	</ul>

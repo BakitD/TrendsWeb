@@ -1,0 +1,71 @@
+{% extends 'geomap/base.html' %}
+
+{% block headblock %}
+	<style>
+
+	.countryHead {
+		background-color: rgba(51, 51, 51, 0.5);
+		text-align: center;
+		color: black;
+	}
+	.panel {
+		background-color: rgba(0,26,26,0.2);
+	}
+	.panel-body {
+		margin: 60px;
+	}
+	td {
+		border: 1px;
+		padding: 5px; 
+	}
+
+	</style>
+	
+
+
+{% endblock %}
+
+{% block content %}
+ <div class="panel">
+    <div class="panel-heading countryHead">
+	<h1>Поиск тем</h1>
+    </div>
+    <div class="panel-body row">
+
+	
+	    <div class="col-xs-6 col-md-4">
+		<h4>Введите строку для поиска тем</h4>
+		<form action="{% url 'search'%}" method="post">
+		  {% csrf_token %}
+		    <table>
+		      <tr>
+		        <td><input type="text" name="value" class="form-control"></td>
+			<td><button type="submit" class="btn btn-primary">Поиск</button></td>
+		      </tr>
+		    </table>			
+		</form>
+	    </div>
+	
+	    <div class="col-xs-12 col-md-6">
+		{% if trends %}
+		  <h4 align=center>Результат поиска "{{ value }}"</h4>
+		  <ul class="list-group">
+		    {% for trend in trends %}
+		      <a href="{% url 'trendinfo' trendid=trend.id trendname=trend.name %}">
+			<li class="list-group-item list-group-item-success" align="center">
+			  <font size=3>{{trend.name}}</font>
+			</li>
+		      </a>
+		    {% endfor %}
+		  </ul>
+		{% elif not trends and post %}
+			<h4 align=center>Для темы "{{ value }}" ничего не найдено</h4>
+		{% endif %}
+	    </div>
+	
+
+      </div>
+
+ </div>
+
+{% endblock %}

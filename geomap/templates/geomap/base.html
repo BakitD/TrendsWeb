@@ -42,7 +42,7 @@
 		      <div class="dropdown pull-right">
 		   {% endif %}
 			  <button class="btn btn-primary btn-sm dropdown-toggle helloTag" 
-					type="button" data-toggle="dropdown">Log In
+					type="button" data-toggle="dropdown">Войти
 			  		<span class="caret"></span></button>
 				  <ul class="dropdown-menu nvbspace">
 
@@ -58,13 +58,13 @@
 				      </li>
 				    {% endif %}
 
-				    <li class="dropdown-header"><font color="black"><b>login</b></font></li>
+				    <li class="dropdown-header"><font color="black"><b>логин</b></font></li>
 				    <li>
 					<font color="black">
 						<input type="text" name="username" value="" />
 					</font>
 				    </li>
-				    <li class="dropdown-header"><font color="black"><b>password</b></font></li>
+				    <li class="dropdown-header"><font color="black"><b>пароль</b></font></li>
 				    <li>
 					<font color="black">
 						<input type="password" name="password" value="" />
@@ -72,24 +72,24 @@
 				    </li>
 				    <p>
 				    <li align="center">
-					<b><input class="btn-success" type="submit" value="submit"/></b>
+					<b><input class="btn-success" type="submit" value="Войти"/></b>
 				    </li>
 				    <li class="divider"></li>
 				    <li align="center">
-					<a href="{% url 'register' %}" class="btn-primary btn-sm"><b>Sign Up</b></a>
+					<a href="{% url 'register' %}" class="btn-primary btn-sm"><b>Регистрация</b></a>
 				    </li>
 				    <li class="divider"></li>
 				    <li align="center">
 					<a href="{% url 'reset' %}" class="btn-warning btn-sm">
-					<b>Password reset</b></a>
+					<b>Забыли пароль?</b></a>
 				    </li>
 				  </ul>
 		      </div>
 		</form>
 	     {% else %}
 		<div class="helloTag">
-		  <h4>Hello, {{ user.first_name }}&nbsp;
-		  &nbsp;<a href="{% url 'logoutview' %}" class="btn-primary btn-sm"><b>Logout</b></a>
+		  <h4>Привет, {{ user.first_name }}&nbsp;
+		  &nbsp;<a href="{% url 'logoutview' %}" class="btn-primary btn-sm"><b>Выйти</b></a>
 		  </h4>
 		</div>
 	     {% endif %}
@@ -126,7 +126,13 @@
 		    <li>
 		      <a href="{% url 'worldwide_trends' %}">
 				<span class="glyphicon glyphicon-globe" style="color:#2eb8b8"></span>
-				<font color=#e5e5ff><b>Общемировой</b></font>
+				<font color=#e5e5ff><b>Мировые тренды</b></font>
+		      </a>
+		    </li>
+		    <li>
+		      <a href="{% url 'search' %}">
+				<span class="glyphicon glyphicon-search" style="color:#2eb8b8"></span>
+				<font color=#e5e5ff><b>Поиск</b></font>
 		      </a>
 		    </li>
 		  {% endif %}

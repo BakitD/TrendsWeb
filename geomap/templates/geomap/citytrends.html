@@ -49,7 +49,7 @@
 	<ul class="list-group col-xs-6 col-md-4">
 	  <li class="list-group-item ctHead" data-toggle="tooltip" title="Check city to see trends">
 	    <font color=black>
-		<strong><i><h3>Places</h3><i></strong>
+		<strong><i><h3>Места</h3><i></strong>
 	    </font>
 	  </li>
 	  {% for ct in placetrends %}
@@ -67,7 +67,8 @@
 	<ul class="list-group col-xs-12 col-md-8">
 	  <li class="list-group-item ctHead">
 	    <font color=black>
-		<strong><i><h3>Trends</h3><i></strong>
+		<strong><i><h3>Темы</h3><i></strong>
+		<h5>Наиболее популярные темы за последние сутки</h5>
 	    </font>
 	  </li>
 
@@ -79,7 +80,7 @@
 		    <div class="col-sm-6 col-md-4">
 			
 			<a href="{% url 'placehistory' place=ct.place woeid=ct.woeid %}"
-				data-toggle="tooltip" title="See trends history for {{ct.place}} !">
+				data-toggle="tooltip" title="Просмотреть историю!">
 				<h3><span class="glyphicon glyphicon-cloud glyphSt"></span></h3>
 			</a>
 			

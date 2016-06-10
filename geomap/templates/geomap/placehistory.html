@@ -68,7 +68,7 @@
 		{% if forloop.first %}<div class="item active">{% else %}<div class="item ">{% endif %}
 		    <ul class="list-group">
 		       <li class="list-group-item lstHead" align="center">
-		           <h3>{{ day.datetime }}'s trends</h3>
+		           <h3>{{ day.datetime }}</h3>
 		       <li>
 			{% for trend in day.trends %}
 		          <li class="list-group-item list-group-item-success" align="center">

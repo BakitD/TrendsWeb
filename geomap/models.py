@@ -9,8 +9,11 @@ from __future__ import unicode_literals
 from django.db import models
 from operator import itemgetter
 
+import time
 from datetime import datetime, timedelta
-from .settings import DATETIME_FORMAT, TREND_STORE_DAYS, TREND_UPDATE_FREQ, DATE_FORMAT, USER_DATE_FORMAT
+from .settings import DATETIME_FORMAT, TREND_STORE_DAYS, TREND_SEARCH_LIMIT, \
+		TREND_UPDATE_FREQ, DATE_FORMAT, USER_DATE_FORMAT
+from collections import OrderedDict
 
 
 class GeoTrend(models.Model):
@@ -26,6 +29,7 @@ class GeoTrend(models.Model):
 
 	def __unicode__(self):
 		return u'trend_id: {0}, place_id: {0}, volume: {3}'.format(self.trend, self.place, self.volume)
+
 
 class Layer(models.Model):
 	name = models.CharField(unique=True, max_length=64)
@@ -103,9 +107,25 @@ class Place(models.Model):
 					dtime__range=[worldwide.dtime.date(), worldwide.dtime])
 			for geotrend in geotrends:
 				trends.append({'name': Trend.objects.filter(id=geotrend.trend_id).first().name,
-						'volume' : geotrend.volume})
+						'volume' : geotrend.volume, 'id':geotrend.trend_id})
 		return {'place' : worldwide.name, 'place_tag' : worldwide.woeid, 'woeid' : worldwide.woeid,
 				'trends' : sorted(trends, key=worldwide.sort_place, reverse=True)}
+
+
+	@staticmethod
+	def get_trend_places(trendid):
+		geotrends = GeoTrend.objects.filter(trend_id=trendid)
+		result = {}
+		for gt in geotrends:
+			place = Place.objects.filter(id=gt.place_id).first()
+			if int(place.woeid) != 1:#and int(place.parent_id) != 1 and 
+				country = Place.objects.filter(woeid=place.parent_id).first()
+				if not result.get(country.name): result[country.name] = []
+				if int(country.woeid) != 1:
+					result[country.name].append({'name':place.name, 'longitude':place.longitude,\
+					'latitude':place.latitude, 'dtime':gt.dtime, 'volume':gt.volume})
+		return OrderedDict(sorted(result.iteritems(), key=lambda x: x))			
+
 
 
 	def sort_place(self, element):
@@ -136,6 +156,16 @@ class Trend(models.Model):
 	def __unicode__(self):
 		return u'{0}'.format(self.name)
 
+	@staticmethod
+	def search_trends(search_value):
+		trends = Trend.objects.filter(name__contains=search_value)
+		return [{'name':e.name, 'id': e.id} for e in trends][:TREND_SEARCH_LIMIT]
+
+
+	@staticmethod
+	def where_trend(trendid, trendname):
+		places = Trend.obj
+
 
 	@staticmethod
 	def get_weektrends(woeid):
@@ -155,4 +185,92 @@ class Trend(models.Model):
 			days_counter += 1
 		return week_trends
 
+
+	@staticmethod
+	def get_tendency(trendid):
+		flag = True
+		result = {'time':[], 'volume':[]}
+		trends = GeoTrend.objects.filter(trend_id=trendid).order_by('dtime')
+		for trend in trends:
+			if not trend.volume:
+				flag = False
+				break
+			timejs = int(time.mktime(trend.dtime.timetuple())) * 1000
+			result['time'].append(timejs)
+			result['volume'].append(trend.volume)
+		return result, flag
+		#return {'time':[1,2,3,4,5,6,7,8,9,10], 'volume':[1,2,3,4,5,6,5,4,3,2]}, True
+
+
+
+class Clusters(models.Model):
+	name = models.CharField(unique=True, max_length=255)
+	valid = models.IntegerField(blank=True, null=True)
+
+	class Meta:
+		managed = False
+		db_table = 'clusters'
+
+	def __unicode__(self):
+		return u'{0}'.format(self.name)
+
+	@staticmethod
+	def get_wordtrend_clusters(trendid):
+		clusters = {}
+		trendwords = TrendWord.objects.filter(trend_id=trendid)
+		for tw in trendwords:
+			word = Word.objects.filter(id=tw.word_id).first()
+			tWords = TrendWord.objects.filter(word_id=word.id)
+			trends = []
+			for two in tWords:
+				t = Trend.objects.filter(id=two.trend_id).first()
+				trends.append({'name':t.name, 'id':t.id})
+			cluster = Clusters.objects.filter(id=word.clusters_id).first()
+			if not clusters.get(cluster.name): clusters[cluster.name] = []
+			clusters[cluster.name].append({'word':word.name, 'trends':trends[:]})
+		return clusters
+
+	@staticmethod
+	def get_trend_clusters(trendid):
+		clusters = {}
+		trendwords = TrendWord.objects.filter(trend_id=trendid)
+		for tw in trendwords:
+			word = Word.objects.filter(id=tw.word_id).first()
+			cluster = Clusters.objects.filter(id=word.clusters_id).first()
+			tWords = TrendWord.objects.filter(word_id=word.id)
+			trends = []
+			if not clusters.get(cluster.name): clusters[cluster.name] = []
+			for two in tWords:
+				if two.trend_id == int(trendid): continue
+				t = Trend.objects.filter(id=two.trend_id).first()
+				newt = {'name':t.name, 'id':t.id}
+				if newt not in clusters[cluster.name]:
+					trends.append(newt)
+			clusters[cluster.name] += trends
+			for cluster in clusters.keys():
+				if not clusters[cluster]: del clusters[cluster]
+		return clusters
+
+
+
+class TrendWord(models.Model):
+	trend = models.ForeignKey(Trend, models.DO_NOTHING)
+	word = models.ForeignKey('Word', models.DO_NOTHING)
+
+	class Meta:
+		managed = False
+		db_table = 'trendword'
+		unique_together = (('word', 'trend'),)
+
+
+class Word(models.Model):
+	name = models.CharField(unique=True, max_length=255)
+	clusters = models.ForeignKey(Clusters, models.DO_NOTHING)
+
+	class Meta:
+		managed = False
+		db_table = 'word'
+
+	def __unicode__(self):
+		return u'{0}'.format(self.name)
 
