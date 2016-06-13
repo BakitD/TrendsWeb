@@ -23,6 +23,7 @@ function drawChart(tendency) {
 		width: 850,
 		height: 400,
 		curveType: 'function',
+		pointSize: 2,
 		backgroundColor : 'transparent',
 		hAxis: { textPosition: 'none' },
           	vAxis: {title: 'Количество упоминаний', gridlines: {color:'grey'}},

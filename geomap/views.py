@@ -127,13 +127,13 @@ def search(request):
 
 @login_required
 def trendinfo(request, trendid, trendname):
-	places = Place.get_trend_places(trendid)
+	places, worldwide = Place.get_trend_places(trendid)
 	clusters = Clusters.get_trend_clusters(trendid)
 	tendency, flag = Trend.get_tendency(trendid)
-	print tendency
 	return render(request, 'geomap/trendinfo.html', {'trendname':trendname, \
 					'tendency' : json.dumps(tendency), 'flag':flag, \
-					'clusters' : clusters, 'places':places})
+					'clusters' : clusters, 'places':places,\
+					'worldwide' : worldwide})
 
 
 
@@ -149,8 +149,9 @@ def places(request):
 def citytrends(request, country, woeid):
 	places = Place.get_citytrends(woeid)
 	country_data = Place.get_countrytrends(woeid)
+	country_name = country_data.get('another_name')
 	if country_data.get('trends'): places.insert(0, country_data)
-	return render(request, 'geomap/citytrends.html', {'placetrends' : places, 'country' : country})
+	return render(request, 'geomap/citytrends.html', {'placetrends' : places, 'country' : country_name})
 
 
 @login_required
@@ -160,8 +161,9 @@ def worldwide_trends(request):
 
 @login_required
 def placehistory(request, place, woeid):
-	week_trends = Trend.get_weektrends(woeid)
-	return render(request, 'geomap/placehistory.html', {'place' : place, 'week_trends' : week_trends})
+	week_trends, another_name = Trend.get_weektrends(woeid)
+	return render(request, 'geomap/placehistory.html', {'place' : place, \
+				'another_name':another_name, 'week_trends' : week_trends})
 
 
 @user_passes_test(anonymous_required)

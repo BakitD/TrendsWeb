@@ -24,7 +24,7 @@
 	    {% for country in countries %}
 		<a href="{% url 'citytrends' country=country.name woeid=country.woeid %}">
 		<li class="list-group-item col-xs-6 col-md-4">
-		  <h3><strong>{{ country.name }}</strong></h3>
+		  <h3><strong>{{ country.another_name }}</strong></h3>
 		</li>
 		</a>
 	    {% endfor %}

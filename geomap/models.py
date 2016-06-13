@@ -28,7 +28,7 @@ class GeoTrend(models.Model):
 		unique_together = (('place', 'trend', 'dtime'),)
 
 	def __unicode__(self):
-		return u'trend_id: {0}, place_id: {0}, volume: {3}'.format(self.trend, self.place, self.volume)
+		return u'trend_id: {0}, place_id: {1}, volume: {2}'.format(self.trend, self.place, self.volume)
 
 
 class Layer(models.Model):
@@ -52,9 +52,10 @@ class Place(models.Model):
 	parent_id = models.CharField(max_length=16, blank=True, null=True)
 	placetype = models.ForeignKey('Placetype', models.DO_NOTHING)
 	layer = models.ForeignKey(Layer, models.DO_NOTHING, blank=True, null=True)
+	another_name = models.CharField(max_length=16, blank=True, null=True)
 
 	def __unicode__(self):
-		return u'{0} ({1})'.format(self.name, self.woeid, self.dtime)
+		return u'{0} ({1}), ({2}, {3})'.format(self.name, self.another_name, self.woeid, self.dtime)
 
 	class Meta:
 		managed = False
@@ -64,7 +65,8 @@ class Place(models.Model):
 	def get_countries():
 		cid = Placetype.objects.filter(name='country').first().id
 		countries = Place.objects.filter(placetype_id=cid).order_by('name')
-		return [{'name' : country.name, 'woeid' : country.woeid} for country in countries]
+		return [{'name' : country.name, 'another_name' : country.another_name,\
+					 'woeid' : country.woeid} for country in countries]
 
 
 	@staticmethod
@@ -81,7 +83,8 @@ class Place(models.Model):
 				trends.append({'name': Trend.objects.filter(id=geotrend.trend_id).first().name,
 						'volume' : geotrend.volume})
 			citytrends.append({'place' : city.name, 'place_tag' : city.woeid, 'woeid' : city.woeid,
-				'trends' : sorted(trends, key=city.sort_place, reverse=True)})
+				'trends' : sorted(trends, key=city.sort_place, reverse=True), \
+				'another_name' : city.another_name})
 		return citytrends
 
 
@@ -94,7 +97,8 @@ class Place(models.Model):
 		for geotrend in geotrends:
 			trends.append({'name': Trend.objects.filter(id=geotrend.trend_id).first().name,
 					'volume' : geotrend.volume})
-		return {'place' : country.name, 'place_tag' : country.woeid, 'woeid' : country.woeid,
+		return {'place' : country.name, 'another_name': country.another_name,'place_tag' : country.woeid, \
+				'woeid' : country.woeid,\
 				'trends' : sorted(trends, key=country.sort_place, reverse=True)}
 	@staticmethod
 	def get_worldwide():
@@ -115,16 +119,23 @@ class Place(models.Model):
 	@staticmethod
 	def get_trend_places(trendid):
 		geotrends = GeoTrend.objects.filter(trend_id=trendid)
+		worldwide = False
 		result = {}
+		'''if len(geotrends) == 1:
+			pl = Place.objects.filter(id=geotrends[0].place_id).first()
+			if pl and int(pl.woeid) == 1: worldwide = True'''
 		for gt in geotrends:
 			place = Place.objects.filter(id=gt.place_id).first()
 			if int(place.woeid) != 1:#and int(place.parent_id) != 1 and 
 				country = Place.objects.filter(woeid=place.parent_id).first()
 				if not result.get(country.name): result[country.name] = []
 				if int(country.woeid) != 1:
-					result[country.name].append({'name':place.name, 'longitude':place.longitude,\
+					result[country.name].append({'name':place.name, 'another_name':place.another_name,\
+					'country_name':country.another_name, 'longitude':place.longitude,\
 					'latitude':place.latitude, 'dtime':gt.dtime, 'volume':gt.volume})
-		return OrderedDict(sorted(result.iteritems(), key=lambda x: x))			
+			elif int(place.woeid) == 1:
+				worldwide = True
+		return OrderedDict(sorted(result.iteritems(), key=lambda x: x)), worldwide
 
 
 
@@ -183,7 +194,7 @@ class Trend(models.Model):
 					'trends' : sorted(trends, key=place.sort_place, reverse=True)})
 			end_date = end_date - timedelta(days=1)
 			days_counter += 1
-		return week_trends
+		return week_trends, place.another_name
 
 
 	@staticmethod

@@ -62,24 +62,30 @@
 	   </a>
 	  </li>
 	  <div id="clusters" class="collapse">
-	  {% for cluster, elements in clusters.iteritems %}
-	    <li class="list-group-item countryHead" align=center>
-	      <a href="#{{cluster}}" data-toggle="collapse">
-		  <strong><h4>{{ cluster }}</h4></strong>
-	      </a>
-	      <div id="{{cluster}}" class="collapse">
-		 <ul class='list-group row'>
-		   {% for trend in elements %}
-			<a href="{% url 'trendinfo' trendid=trend.id trendname=trend.name %}">
-			  <li class="list-group-item col-xs-6 col-md-4 classTag">
-			    <font color=black size=3>{{ trend.name }}</font><p>
-			  </li>
-			</a>
-		   {% endfor %}
-		 </ul>
-	      </div>
-	    </li>
-	  {% endfor %}
+	  {% if clusters %}
+		  {% for cluster, elements in clusters.iteritems %}
+		    <li class="list-group-item countryHead" align=center>
+		      <a href="#{{cluster}}" data-toggle="collapse">
+			  <strong><h4>{{ cluster }}</h4></strong>
+		      </a>
+		      <div id="{{cluster}}" class="collapse">
+			 <ul class='list-group row'>
+			   {% for trend in elements %}
+				<a href="{% url 'trendinfo' trendid=trend.id trendname=trend.name %}">
+				  <li class="list-group-item col-xs-6 col-md-4 classTag">
+				    <font color=black size=3>{{ trend.name }}</font><p>
+				  </li>
+				</a>
+			   {% endfor %}
+			 </ul>
+		      </div>
+		    </li>
+		  {% endfor %}
+	  {% else %}
+		<li class="list-group-item countryHead" align=center>
+			  <strong><h4>Информация отсутствует!</h4></strong>
+		</li>
+	  {% endif %}
 	  </div>
 	 </ul>
 	</div>
@@ -94,18 +100,28 @@
 	   </a>
 	  </li>
 	  <div id="where" class="collapse">
-	  {% for country, cities in places.iteritems %}
-	    <li class="list-group-item countryHead" align=center>
-	      <a href="#{{country}}" data-toggle="collapse">
-		  <strong><h4>{{ country }}</h4></strong>
-	      </a>
-		<div id="{{country}}" class="collapse">
-		{% for city in cities %}
-			<font color=black size=3>{{ city.name }}</font><p>
-		{% endfor %}
-		</div>
-	    </li>
-	  {% endfor %}
+	  {% if places %}
+		  {% for country, cities in places.iteritems %}
+		    <li class="list-group-item countryHead" align=center>
+		      <a href="#{{country}}" data-toggle="collapse">
+			  <strong><h4>{{ cities.0.country_name }}</h4></strong>
+		      </a>
+			<div id="{{country}}" class="collapse">
+			{% for city in cities %}
+				<font color=black size=3>{{ city.another_name }}</font><p>
+			{% endfor %}
+			</div>
+		    </li>
+		  {% endfor %}
+	 {% elif worldwide %}
+		<li class="list-group-item countryHead" align=center>
+			  <strong><h4>Мировой</h4></strong>
+		</li>
+	 {% else %}
+		<li class="list-group-item countryHead" align=center>
+			  <strong><h4>Информация отсутствует!</h4></strong>
+		</li>
+	 {% endif %}
 	  </div>
 	 </ul>
 	</div>
