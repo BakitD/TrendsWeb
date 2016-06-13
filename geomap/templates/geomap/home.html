@@ -38,8 +38,14 @@
 	<script type="text/javascript">
 		var mapConfigJS = {{ mapConfig | safe }};
 		var authUserFlagJS = {{ authUserFlag | safe }};
-		var trendsJS = {{ trends | safe }};
-		renderMap('map', mapConfigJS, authUserFlagJS, trendsJS);
+		var places = {{ places | safe }};
+		if (Object.keys(places).length === 0 && places.constructor === Object) {
+			var trendsJS = {{ trends | safe }};
+			renderMap('map', mapConfigJS, authUserFlagJS, trendsJS);
+		}
+		else {
+			renderMapForTags('map', mapConfigJS, places)
+		}
 	</script>
 {% endblock %}
 

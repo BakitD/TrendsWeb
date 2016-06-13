@@ -161,3 +161,34 @@ function renderMap(mapId, mapConfig, authUserFlag, trends) {
 	}
 }
 
+
+// Initialization function. Function for trend places tags.
+function renderMapForTags(mapId, mapConfig, places) {
+
+	// Initializing map
+	L.mapbox.accessToken = mapConfig.accessToken;
+	var mapLayerURL = mapConfig.mapURL + L.mapbox.accessToken
+	var mapboxTiles = L.tileLayer(mapLayerURL, {attribution: mapConfig.attribution });
+
+	var map = L.map(document.getElementById(mapId), {
+				minZoom:mapConfig.minZoom, 
+				maxZoom:mapConfig.maxZoom,
+				zoomControl: false, 
+				worldCopyJump: true,
+				closePopupOnClick: false 
+			}
+		)
+		.addLayer(mapboxTiles)
+		.setView([mapConfig.initLat, mapConfig.initLng], mapConfig.initZoom);
+
+	new L.Control.Zoom({ position: 'bottomright' }).addTo(map);
+
+	for (key in places) {
+		L.marker([parseFloat(places[key].latitude), 
+			parseFloat(places[key].longitude)], 
+			{'title':places[key].name}).addTo(map);
+	};
+
+
+}
+

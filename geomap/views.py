@@ -25,16 +25,20 @@ def anonymous_required(user):
 	return user.is_anonymous()
 
 
-def index(request):
-	#TODO add trends for non authenticated users
+def index(request, trendname=None, trendid=None):
+	places = {}
 	if not request.user.is_authenticated():
 		trends = tStore.get_trends_by_layer(mapConfig.get('initScaleIndex'));
-	else: trends = {}
+	else: 
+		trends = {}
+		if trendname and trendid: 
+			places = Place.get_places_for_trend(trendid)
 	return render(request, 'geomap/home.html', {
 			'login_errors': request.session.pop('login_errors', None),
 			'mapConfig' : mapConfig,
 			'authUserFlag' : int(request.user.is_authenticated()),
-			'trends' : json.dumps(trends)
+			'trends' : json.dumps(trends),
+			'places' : json.dumps(places),
 		})
 
 def about(request):
@@ -130,7 +134,7 @@ def trendinfo(request, trendid, trendname):
 	places, worldwide = Place.get_trend_places(trendid)
 	clusters = Clusters.get_trend_clusters(trendid)
 	tendency, flag = Trend.get_tendency(trendid)
-	return render(request, 'geomap/trendinfo.html', {'trendname':trendname, \
+	return render(request, 'geomap/trendinfo.html', {'trendname':trendname, 'trendid' : trendid,\
 					'tendency' : json.dumps(tendency), 'flag':flag, \
 					'clusters' : clusters, 'places':places,\
 					'worldwide' : worldwide})

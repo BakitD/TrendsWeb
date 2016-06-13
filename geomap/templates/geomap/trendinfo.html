@@ -40,6 +40,11 @@
 			border: 1px;
 			padding: 5px; 
 		}
+		.glyphSt {
+			color:#009900;
+		
+		}
+
 	</style>
 
 {% endblock %}
@@ -101,7 +106,14 @@
 	  </li>
 	  <div id="where" class="collapse">
 	  {% if places %}
+		  <li class="list-group-item countryHead" align=center>
+			<a href="{% url 'trendonmap' trendname=trendname trendid=trendid %}" 
+						data-toggle="tooltip" title="На карте">
+				<span class="glyphicon glyphicon-map-marker glyphSt"></span>
+			</a>
+		  </li>
 		  {% for country, cities in places.iteritems %}
+		   {% if cities %}
 		    <li class="list-group-item countryHead" align=center>
 		      <a href="#{{country}}" data-toggle="collapse">
 			  <strong><h4>{{ cities.0.country_name }}</h4></strong>
@@ -112,6 +124,7 @@
 			{% endfor %}
 			</div>
 		    </li>
+		   {% endif %}
 		  {% endfor %}
 	 {% elif worldwide %}
 		<li class="list-group-item countryHead" align=center>

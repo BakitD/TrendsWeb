@@ -27,6 +27,7 @@ class GeoTrend(models.Model):
 		db_table = 'geotrend'
 		unique_together = (('place', 'trend', 'dtime'),)
 
+
 	def __unicode__(self):
 		return u'trend_id: {0}, place_id: {1}, volume: {2}'.format(self.trend, self.place, self.volume)
 
@@ -60,6 +61,18 @@ class Place(models.Model):
 	class Meta:
 		managed = False
 		db_table = 'place'
+
+
+	@staticmethod
+	def get_places_for_trend(trendid):
+		geotrends = GeoTrend.objects.filter(trend_id=trendid)
+		places = {}
+		for gt in geotrends:
+			place = Place.objects.filter(id=gt.place_id).first()
+			places[int(place.woeid)] = {'name':place.name, 'longitude':place.longitude,
+						'latitude':place.latitude}
+		return places
+
 
 	@staticmethod
 	def get_countries():
