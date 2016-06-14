@@ -64,13 +64,14 @@ class Place(models.Model):
 
 
 	@staticmethod
-	def get_places_for_trend(trendid):
+	def get_places_for_trend(trendid, date):
 		geotrends = GeoTrend.objects.filter(trend_id=trendid)
 		places = {}
 		for gt in geotrends:
-			place = Place.objects.filter(id=gt.place_id).first()
-			places[int(place.woeid)] = {'name':place.name, 'longitude':place.longitude,
-						'latitude':place.latitude}
+			if gt.dtime.strftime(USER_DATE_FORMAT) == date:
+				place = Place.objects.filter(id=gt.place_id).first()
+				places[int(place.woeid)] = {'name':place.name, 'longitude':place.longitude,
+						'latitude':place.latitude, 'dates' : []}
 		return places
 
 
@@ -131,24 +132,32 @@ class Place(models.Model):
 
 	@staticmethod
 	def get_trend_places(trendid):
-		geotrends = GeoTrend.objects.filter(trend_id=trendid)
+		geotrends = GeoTrend.objects.filter(trend_id=trendid)#.order_by('dtime')
 		worldwide = False
 		result = {}
-		'''if len(geotrends) == 1:
-			pl = Place.objects.filter(id=geotrends[0].place_id).first()
-			if pl and int(pl.woeid) == 1: worldwide = True'''
-		for gt in geotrends:
-			place = Place.objects.filter(id=gt.place_id).first()
-			if int(place.woeid) != 1:#and int(place.parent_id) != 1 and 
-				country = Place.objects.filter(woeid=place.parent_id).first()
-				if not result.get(country.name): result[country.name] = []
-				if int(country.woeid) != 1:
-					result[country.name].append({'name':place.name, 'another_name':place.another_name,\
-					'country_name':country.another_name, 'longitude':place.longitude,\
+		places = Place.objects.all()
+		for gt in geotrends:	
+			dtime = gt.dtime.strftime(USER_DATE_FORMAT)
+			if not result.get(dtime): result[dtime] = {}
+			place = places.get(id=gt.place_id)
+			if int(place.woeid) != 1:#and int(place.parent_id) != 1 and
+				if int(place.parent_id) == 1: country = place
+				else: country = places.get(woeid=place.parent_id)
+				if not result[dtime].get(country.name):
+					result[dtime][country.name] = { 'cities' : [], \
+							'countrytagname' : country.name.replace(' ', ''),\
+							'country_name':country.another_name}
+				if int(place.parent_id) != 1:
+					result[dtime][country.name]['cities'].append({'name':place.name,\
+					'another_name':place.another_name,\
+					'longitude':place.longitude,\
 					'latitude':place.latitude, 'dtime':gt.dtime, 'volume':gt.volume})
 			elif int(place.woeid) == 1:
 				worldwide = True
-		return OrderedDict(sorted(result.iteritems(), key=lambda x: x)), worldwide
+			result[dtime]['tagtime'] = gt.dtime.strftime('%d%m%Y')
+		for key in result.keys():
+			result[key] = OrderedDict(sorted(result[key].iteritems(), key=lambda x: x))
+		return result, worldwide
 
 
 

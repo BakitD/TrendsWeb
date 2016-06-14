@@ -4,7 +4,7 @@ from .import views
 
 urlpatterns = [
 	url(r'^$', views.index, name='index'),
-	url(r'^trend/on/map/(?P<trendid>.+?)/(?P<trendname>.+?)/$', views.index, name='trendonmap'),
+	url(r'^trend/on/map/(?P<trendid>.+?)/(?P<trendname>.+?)/(?P<date>.+?)/$', views.index, name='trendonmap'),
 	url(r'^about/$', views.about, name='about'),
 	url(r'^register/$', views.register, name='register'),
 	url(r'^login/$', views.loginview, name='loginview'),

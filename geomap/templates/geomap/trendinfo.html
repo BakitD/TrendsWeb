@@ -105,31 +105,42 @@
 	   </a>
 	  </li>
 	  <div id="where" class="collapse">
-	  {% if places %}
-		  <li class="list-group-item countryHead" align=center>
-			<a href="{% url 'trendonmap' trendname=trendname trendid=trendid %}" 
+	   {% if places %}
+	    <ul class="list-group">
+	    {% for date, regions in places.iteritems %}
+		<li class="list-group-item ctHead" data-toggle="tooltip">
+			<a href="#{{regions.tagtime}}" data-toggle="collapse">
+				<font color="#0040ff"><b>{{date}}</b></font>
+			</a>
+			<a href="{% url 'trendonmap' trendname=trendname trendid=trendid date=date %}" 
 						data-toggle="tooltip" title="На карте">
 				<span class="glyphicon glyphicon-map-marker glyphSt"></span>
 			</a>
-		  </li>
-		  {% for country, cities in places.iteritems %}
-		   {% if cities %}
-		    <li class="list-group-item countryHead" align=center>
-		      <a href="#{{country}}" data-toggle="collapse">
-			  <strong><h4>{{ cities.0.country_name }}</h4></strong>
-		      </a>
-			<div id="{{country}}" class="collapse">
-			{% for city in cities %}
-				<font color=black size=3>{{ city.another_name }}</font><p>
-			{% endfor %}
-			</div>
-		    </li>
-		   {% endif %}
-		  {% endfor %}
-	 {% elif worldwide %}
-		<li class="list-group-item countryHead" align=center>
-			  <strong><h4>Мировой</h4></strong>
 		</li>
+		<div id="{{regions.tagtime}}" class="collapse">
+		  <ul class="list-group">
+		   {% for country, country_data in regions.iteritems %}
+		      {% if country != 'tagtime' %}
+		        <li class="list-group-item countryHead" align=center>
+		          <a href="#{{country_data.countrytagname}}{{regions.tagtime}}" data-toggle="collapse">
+			    <h4>{{ country_data.country_name }}</h4>
+		          </a>
+			  <div id="{{country_data.countrytagname}}{{regions.tagtime}}" class="collapse">
+			    {% for city in country_data.cities %}
+			   	<font color=black size=3>{{ city.another_name }}</font><p>
+			    {% endfor %}
+			  </div>
+		        </li>
+		       {% elif worldwide %}
+				<li class="list-group-item countryHead" align=center>
+					  <strong><h4>Мировой</h4></strong>
+				</li>
+		      {% endif %}
+		   {% endfor %}
+		  </ul>
+		</div>
+	   {% endfor %}
+	   </ul>
 	 {% else %}
 		<li class="list-group-item countryHead" align=center>
 			  <strong><h4>Информация отсутствует!</h4></strong>
