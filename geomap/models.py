@@ -120,14 +120,18 @@ class Place(models.Model):
 		placetype = Placetype.objects.filter(name='worldwide').first()
 		if placetype:
 			worldwide = Place.objects.filter(placetype_id=placetype.id).first()
+			geotrends = []
 			if worldwide:
 				geotrends = GeoTrend.objects.filter(place_id=worldwide.id,
 					dtime__range=[worldwide.dtime.date(), worldwide.dtime])
 			for geotrend in geotrends:
 				trends.append({'name': Trend.objects.filter(id=geotrend.trend_id).first().name,
 						'volume' : geotrend.volume, 'id':geotrend.trend_id})
-		return {'place' : worldwide.name, 'place_tag' : worldwide.woeid, 'woeid' : worldwide.woeid,
+		if not trends: result = []
+		else:
+			result = {'place' : worldwide.name, 'place_tag' : worldwide.woeid, 'woeid' : worldwide.woeid,
 				'trends' : sorted(trends, key=worldwide.sort_place, reverse=True)}
+		return result
 
 
 	@staticmethod
@@ -223,12 +227,12 @@ class Trend(models.Model):
 	def get_tendency(trendid):
 		flag = True
 		result = {'time':[], 'volume':[]}
-		trends = GeoTrend.objects.filter(trend_id=trendid).order_by('dtime')
+		trends = GeoTrend.objects.filter(trend_id=trendid).order_by('volume')
 		for trend in trends:
 			if not trend.volume:
 				flag = False
 				break
-			timejs = int(time.mktime(trend.dtime.timetuple())) * 1000
+			timejs = int(time.mktime(trend.dtime.timetuple())) * 1000.0
 			result['time'].append(timejs)
 			result['volume'].append(trend.volume)
 		return result, flag

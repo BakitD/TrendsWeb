@@ -29,10 +29,12 @@ def index(request, trendname=None, trendid=None, date=None):
 	places = {}
 	if not request.user.is_authenticated():
 		trends = tStore.get_trends_by_layer(mapConfig.get('initScaleIndex'));
-	else: 
+	else:
 		trends = {}
 		if trendname and trendid and date: 
 			places = Place.get_places_for_trend(trendid, date)
+		#else:
+		#	trends = tStore.get_trends_by_layer(mapConfig.get('initScaleIndex'));
 	return render(request, 'geomap/home.html', {
 			'login_errors': request.session.pop('login_errors', None),
 			'mapConfig' : mapConfig,
@@ -143,9 +145,6 @@ def trendinfo(request, trendid, trendname):
 
 @login_required
 def places(request):
-	'''import goslate
-	gs = goslate.Goslate()
-	for place in Place.get_countries(): print gs.translate(place['name'], 'ru')'''
 	return render(request, 'geomap/places.html', {'countries' : Place.get_countries()})
 
 
@@ -196,7 +195,19 @@ def ajax_map_zoom(request):
 	neLng = float(request.POST.get('northEastLongitude'))
 	scale = int(request.POST.get('scale'))
 	trends = tStore.get_places(scale, swLat, swLng, neLat, neLng)
+	if scale == 0:
+		initTrends = tStore.get_trends_by_layer(mapConfig.get('initScaleIndex'));
+		trends.update(initTrends)
 	return HttpResponse(json.dumps({'trends' : trends}))
+
+
+
+
+
+
+
+
+
 
 
 
