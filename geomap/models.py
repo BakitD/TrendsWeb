@@ -45,7 +45,7 @@ class Layer(models.Model):
 
 
 class Place(models.Model):
-	name = models.CharField(max_length=32)
+	name = models.CharField(max_length=64)
 	woeid = models.CharField(unique=True, max_length=16)
 	longitude = models.CharField(max_length=32)
 	latitude = models.CharField(max_length=32)
@@ -53,7 +53,7 @@ class Place(models.Model):
 	parent_id = models.CharField(max_length=16, blank=True, null=True)
 	placetype = models.ForeignKey('Placetype', models.DO_NOTHING)
 	layer = models.ForeignKey(Layer, models.DO_NOTHING, blank=True, null=True)
-	another_name = models.CharField(max_length=16, blank=True, null=True)
+	another_name = models.CharField(max_length=64, blank=True, null=True)
 
 	def __unicode__(self):
 		return u'{0} ({1}), ({2}, {3})'.format(self.name, self.another_name, self.woeid, self.dtime)
@@ -72,13 +72,16 @@ class Place(models.Model):
 				place = Place.objects.filter(id=gt.place_id).first()
 				places[int(place.woeid)] = {'name':place.name, 'longitude':place.longitude,
 						'latitude':place.latitude, 'dates' : []}
+		try:
+			if places.get(1): del places[1]
+		except Exception: pass
 		return places
 
 
 	@staticmethod
 	def get_countries():
 		cid = Placetype.objects.filter(name='country').first().id
-		countries = Place.objects.filter(placetype_id=cid).order_by('name')
+		countries = Place.objects.filter(placetype_id=cid).order_by('another_name')
 		return [{'name' : country.name, 'another_name' : country.another_name,\
 					 'woeid' : country.woeid} for country in countries]
 
@@ -87,7 +90,7 @@ class Place(models.Model):
 	def get_citytrends(woeid):
 		citytrends = []
 		country = Place.objects.filter(woeid=woeid).first()
-		cities = Place.objects.filter(parent_id=woeid).order_by('name')
+		cities = Place.objects.filter(parent_id=woeid).order_by('another_name')
 		for city in cities:
 			geotrends = GeoTrend.objects.filter(place_id=city.id, 
 				dtime__range=[city.dtime.date(), city.dtime])#values('trend_id', 'volume')

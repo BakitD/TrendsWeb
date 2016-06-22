@@ -112,10 +112,12 @@
 			<a href="#{{regions.tagtime}}" data-toggle="collapse">
 				<font color="#0040ff"><b>{{date}}</b></font>
 			</a>
+		{% if regions|length > 1 %}
 			<a href="{% url 'trendonmap' trendname=trendname trendid=trendid date=date %}" 
 						data-toggle="tooltip" title="На карте">
 				<span class="glyphicon glyphicon-map-marker glyphSt"></span>
 			</a>
+		{% endif %}
 		</li>
 		<div id="{{regions.tagtime}}" class="collapse">
 		  <ul class="list-group">
