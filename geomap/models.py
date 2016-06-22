@@ -229,7 +229,7 @@ class Trend(models.Model):
 	@staticmethod
 	def get_tendency(trendid):
 		flag = True
-		result = {'time':[], 'volume':[]}
+		result = {'time':[], 'volume':[], 'strtime' : []}
 		trends = GeoTrend.objects.filter(trend_id=trendid).order_by('volume')
 		for trend in trends:
 			if not trend.volume:
@@ -237,6 +237,7 @@ class Trend(models.Model):
 				break
 			timejs = int(time.mktime(trend.dtime.timetuple())) * 1000.0
 			result['time'].append(timejs)
+			result['strtime'].append(trend.dtime.strftime('%d.%m.%Y, %H:%M'))
 			result['volume'].append(trend.volume)
 		return result, flag
 		#return {'time':[1,2,3,4,5,6,7,8,9,10], 'volume':[1,2,3,4,5,6,5,4,3,2]}, True
