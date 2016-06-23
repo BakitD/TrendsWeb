@@ -99,7 +99,9 @@
 		</li>
 		{% for trend in ct.trends %}
 		  <li class="list-group-item" align="center">
-			<strong>{{ trend.name }}</strong>
+			<a href="{% url 'trendinfo' trendid=trend.id trendname=trend.name %}">
+	              		<strong>{{ trend.name }}</strong>
+		   	 </a>
 			{% comment %}	
 			<span class="badge">
 				{% if not trend.volume %}	n/a

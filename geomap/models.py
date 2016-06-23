@@ -9,10 +9,11 @@ from __future__ import unicode_literals
 from django.db import models
 from operator import itemgetter
 
+
 import time
 from datetime import datetime, timedelta
 from .settings import DATETIME_FORMAT, TREND_STORE_DAYS, TREND_SEARCH_LIMIT, \
-		TREND_UPDATE_FREQ, DATE_FORMAT, USER_DATE_FORMAT
+		TREND_UPDATE_FREQ, DATE_FORMAT, USER_DATE_FORMAT,MAX_TRENDS_PER_CLUSTER_FOUND
 from collections import OrderedDict
 
 
@@ -83,7 +84,7 @@ class Place(models.Model):
 		cid = Placetype.objects.filter(name='country').first().id
 		countries = Place.objects.filter(placetype_id=cid).order_by('another_name')
 		return [{'name' : country.name, 'another_name' : country.another_name,\
-					 'woeid' : country.woeid} for country in countries]
+				'woeid' : country.woeid} for country in countries]
 
 
 	@staticmethod
@@ -93,12 +94,12 @@ class Place(models.Model):
 		cities = Place.objects.filter(parent_id=woeid).order_by('another_name')
 		for city in cities:
 			geotrends = GeoTrend.objects.filter(place_id=city.id, 
-				dtime__range=[city.dtime.date(), city.dtime])#values('trend_id', 'volume')
+				dtime__range=[city.dtime.date(), city.dtime]).order_by('-dtime')#values('trend_id', 'volume')
 			if not geotrends: continue
 			trends = []
 			for geotrend in geotrends:
 				trends.append({'name': Trend.objects.filter(id=geotrend.trend_id).first().name,
-						'volume' : geotrend.volume})
+					 'volume' : geotrend.volume, 'id' : geotrend.trend_id})
 			citytrends.append({'place' : city.name, 'place_tag' : city.woeid, 'woeid' : city.woeid,
 				'trends' : sorted(trends, key=city.sort_place, reverse=True), \
 				'another_name' : city.another_name})
@@ -113,7 +114,7 @@ class Place(models.Model):
 		trends = []
 		for geotrend in geotrends:
 			trends.append({'name': Trend.objects.filter(id=geotrend.trend_id).first().name,
-					'volume' : geotrend.volume})
+					'volume' : geotrend.volume, 'id' : geotrend.trend_id})
 		return {'place' : country.name, 'another_name': country.another_name,'place_tag' : country.woeid, \
 				'woeid' : country.woeid,\
 				'trends' : sorted(trends, key=country.sort_place, reverse=True)}
@@ -230,7 +231,11 @@ class Trend(models.Model):
 	def get_tendency(trendid):
 		flag = True
 		result = {'time':[], 'volume':[], 'strtime' : []}
-		trends = GeoTrend.objects.filter(trend_id=trendid).order_by('volume')
+		#trends = GeoTrend.objects.annotate(
+		trends = GeoTrend.objects.filter(trend_id=trendid).order_by('dtime')
+		#query = 'select * from geotrend where trend_id = ' + str(trendid) + \
+		#		' order by volume, dtime;'
+		#trends = GeoTrend.objects.raw(query)
 		for trend in trends:
 			if not trend.volume:
 				flag = False
@@ -278,7 +283,10 @@ class Clusters(models.Model):
 		for tw in trendwords:
 			word = Word.objects.filter(id=tw.word_id).first()
 			cluster = Clusters.objects.filter(id=word.clusters_id).first()
-			tWords = TrendWord.objects.filter(word_id=word.id)
+			words_of_cluster = Word.objects.filter(clusters_id=cluster.id)
+			twids = [w.id for w in words_of_cluster] or [word.id,]
+			#tWords = TrendWord.objects.filter(word_id=word.id)
+			tWords = TrendWord.objects.filter(word_id__in=twids)
 			trends = []
 			if not clusters.get(cluster.name): clusters[cluster.name] = []
 			for two in tWords:
@@ -287,10 +295,12 @@ class Clusters(models.Model):
 				newt = {'name':t.name, 'id':t.id}
 				if newt not in clusters[cluster.name]:
 					trends.append(newt)
-			clusters[cluster.name] += trends
+			clusters[cluster.name] += trends[:MAX_TRENDS_PER_CLUSTER_FOUND]
 			for cluster in clusters.keys():
 				if not clusters[cluster]: del clusters[cluster]
 		return clusters
+
+
 
 
 

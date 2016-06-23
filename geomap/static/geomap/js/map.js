@@ -173,9 +173,9 @@ function renderMapForTags(mapId, mapConfig, places) {
 	var map = L.map(document.getElementById(mapId), {
 				minZoom:mapConfig.minZoom, 
 				maxZoom:mapConfig.maxZoom,
-				zoomControl: false, 
+				zoomControl: false,
 				worldCopyJump: true,
-				closePopupOnClick: false 
+				closePopupOnClick: false
 			}
 		)
 		.addLayer(mapboxTiles)
